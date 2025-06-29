@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { FaHeart, FaShoppingBag, FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes } from 'react-icons/fa'
+import { FaHeart,  FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes } from 'react-icons/fa'
 import { CiSearch } from 'react-icons/ci'
 import Link from 'next/link'
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
+  // const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
 
   const navItems = [
     { title: 'New' },

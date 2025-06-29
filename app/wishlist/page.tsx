@@ -1,6 +1,6 @@
 'use client'
 
-import { FaTrash, FaHeart } from 'react-icons/fa'
+import { FaTrash } from 'react-icons/fa'
 
 const wishlistItems = [
   {

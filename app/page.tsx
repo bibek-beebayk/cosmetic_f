@@ -10,9 +10,9 @@ export default function Home() {
     <main>
       <HeroSlider />
       <NewArrivals />
+      <BrandsSection />
       <BestSellers />
       <ShopByCategory />
-      <BrandsSection />
       <BlogSection />
       {/* More sections here */}
     </main>

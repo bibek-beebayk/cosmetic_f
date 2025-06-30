@@ -1,21 +1,26 @@
 'use client'
 
+import Link from "next/link"
+
 const blogPosts = [
   {
     id: 1,
     title: '5 Skincare Tips for Glowing Skin',
+    slug: '5-skincare-tips-for-glowing-skin',
     summary: 'Discover how to keep your skin radiant with these easy skincare steps you can follow daily.',
     image: '/blog/blog1.jpg',
   },
   {
     id: 2,
     title: 'How to Choose the Right Cleanser',
+    slug: 'how-to-choose-the-right-cleanser',
     summary: 'Learn how to pick the perfect cleanser for your skin type, whether it’s oily, dry or sensitive.',
     image: '/blog/blog1.jpg',
   },
   {
     id: 3,
     title: 'Makeup Removal Routine That Works',
+    slug: 'makeup-removal-routine-that-works',
     summary: 'Wearing makeup daily? Here’s a gentle but effective night-time routine for clear, happy skin.',
     image: '/blog/blog1.jpg',
   },
@@ -37,9 +42,9 @@ export default function BlogSection() {
             <div className="p-4">
               <h3 className="text-lg font-semibold mb-2 text-gray-800">{post.title}</h3>
               <p className="text-sm text-gray-600 mb-3">{post.summary}</p>
-              <a href="#" className="text-primary text-sm font-medium hover:underline">
+              <Link href={`/blog/${post.slug}`} className="text-primary text-sm font-medium hover:underline">
                 Read More →
-              </a>
+              </Link>
             </div>
           </div>
         ))}

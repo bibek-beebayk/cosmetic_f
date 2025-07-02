@@ -1,40 +1,27 @@
 // Header.tsx
 'use client'
 
-import { useState } from 'react'
-import { FaHeart, FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes } from 'react-icons/fa'
-import { CiSearch } from 'react-icons/ci'
+import { useNavMenu } from '@/hooks/useNavMenu'
 import Link from 'next/link'
-import { useAuth } from '@/context/AuthContext'
-import {useNavMenu} from '@/hooks/useNavMenu'
-import { usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
+import { CiSearch } from 'react-icons/ci'
+import { FaBars, FaHeart, FaMapMarkerAlt, FaShoppingCart, FaTimes } from 'react-icons/fa'
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const {isAuthenticated} = useAuth()
-  const {data = []} = useNavMenu()
-  const pathname = usePathname()
+  const { data = [] } = useNavMenu()
   const searchParams = useSearchParams()
+  const [searchTerm, setSearchTerm] = useState('')
+  const router = useRouter()
 
-  const category = searchParams.get('category') 
+  const category = searchParams.get('category')
 
-  console.log("Data: ", data)
-
-  console.log('isAuthenticated:', isAuthenticated)
-
-  const navItems = [
-    { title: 'New' },
-    { title: 'Makeup', submenu: ['Face', 'Eyes', 'Lips'] },
-    { title: 'Skincare', submenu: ['Moisturizers', 'Cleansers', 'Serums'] },
-    { title: 'Hair' },
-    { title: 'Tools & Brushes' },
-    { title: 'Bath & Body' },
-    { title: 'Fragrance' },
-    { title: 'Clean' },
-    { title: 'Gifts & Gift Cards' },
-    { title: 'Brands' },
-    { title: 'Sale' },
-  ]
+  const handleSearch = () => {
+    if (searchTerm) {
+      router.push(`/products/?search=${searchTerm}`)
+    }
+  }
 
   return (
     <>
@@ -72,10 +59,23 @@ export default function Header() {
             <input
               type="text"
               placeholder="What are you looking for?"
-              className="w-full border px-4 py-2 pl-10 rounded-full text-sm focus:outline-none"
+              className="w-full border px-4 py-2 pl-10 pr-16 rounded-full text-sm focus:outline-none"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
+            {/* Left icon */}
             <CiSearch className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-500 text-lg" />
+
+            {/* Right button */}
+            <button
+              className="absolute top-1/2 right-1 -translate-y-1/2 bg-black text-white text-xs px-3 py-1 rounded-full hover:bg-gray-800"
+              aria-label="Search"
+              onClick={handleSearch}
+            >
+              Search
+            </button>
           </div>
+
 
           {/* Shipping Info */}
           <div className="hidden md:block text-[11px] md:text-sm text-right text-gray-600 leading-tight">
@@ -101,7 +101,7 @@ export default function Header() {
           {data.map((item, i) => (
 
             <div key={i} className="relative group">
-              <a href={item.link} className={`hover:text-primary transition whitespace-nowrap ${item.link.split("=")[1] == category ? "text-red-600" : "text-black" }`}>
+              <a href={item.link} className={`hover:text-primary transition whitespace-nowrap ${item.link.split("=")[1] == category ? "text-red-600" : "text-black"}`}>
                 {item.title}
               </a>
               {item.submenu && item.submenu.length > 0 && (
@@ -122,10 +122,10 @@ export default function Header() {
           className={`md:hidden transform transition-all duration-300 ease-in-out origin-top overflow-hidden ${menuOpen ? 'max-h-[1000px] opacity-100 scale-y-100' : 'max-h-0 opacity-0 scale-y-0'}`}
         >
           <div className="flex flex-col px-4 pb-4 text-sm font-medium text-gray-700 border-t">
-            {navItems.map((item, i) => (
+            {data.map((item, i) => (
               <div key={i}>
                 <a
-                  href="#"
+                  href={item.link}
                   className="py-2 block border-b last:border-b-0 hover:text-primary transition"
                   onClick={() => setMenuOpen(false)}
                 >
@@ -136,11 +136,11 @@ export default function Header() {
                     {item.submenu.map((sub, j) => (
                       <a
                         key={j}
-                        href="#"
+                        href={sub.link}
                         className="block py-1 border-b text-sm hover:text-primary"
                         onClick={() => setMenuOpen(false)}
                       >
-                        {sub}
+                        {sub.link}
                       </a>
                     ))}
                   </div>

@@ -5,7 +5,7 @@ import Pagination from '@/components/Pagination'
 import ProductCard from '@/components/ProductCard'
 import { apiCall } from '@/lib/axios'
 import { PaginationType, ProductList } from '@/types/core'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
@@ -26,7 +26,7 @@ type Response = {
 
 export default function ProductListPage() {
   // const [priceRange, setPriceRange] = useState(100)
-  const [searchTerm, setSearchTerm] = useState('')
+  // const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState('Default')
   const [visibleCount, setVisibleCount] = useState(6)
   const [showFilters, setShowFilters] = useState(false)
@@ -35,19 +35,27 @@ export default function ProductListPage() {
   const [page, setPage] = useState(1)
   const [minPrice, setMinPrice] = useState<number | ''>('')
   const [maxPrice, setMaxPrice] = useState<number | ''>('')
-  
-  const searchParams = useSearchParams();
 
-  const category = searchParams.get("category")
+  const searchParams = useSearchParams();
+  const search = searchParams.get('search') || ''
+  const category = searchParams.get('category') || ''
+
   console.log("Category: ", category)
+
+  // useEffect(() => {
+  //   const search = searchParams.get("search")
+  //   if (search) {
+  //     setSearchTerm(search)
+  //   }
+  // }, [searchParams])
 
   const requestParams = {
     min_price: minPrice || undefined,
     max_price: maxPrice || undefined,
-    search: searchTerm,
+    search: search || undefined,
     sort: sortBy,
     page: page,
-    category: category
+    category: category || undefined
   }
 
 
@@ -60,7 +68,7 @@ export default function ProductListPage() {
       setPagination(res.pagination)
     }
     fetchProducts()
-  }, [minPrice, maxPrice, searchTerm, sortBy, page])
+  }, [minPrice, maxPrice, sortBy, page, search, category])
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -71,7 +79,7 @@ export default function ProductListPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="flex items-center justify-between mb-6 md:hidden">
-        <h1 className="text-xl font-bold">Products</h1>
+        <h1 className="text-xl font-bold">{category?.toUpperCase()}</h1>
         <button onClick={() => setShowFilters(true)} className="flex items-center gap-2 text-sm border px-3 py-1 rounded">
           <FaFilter /> Filter
         </button>
@@ -87,8 +95,8 @@ export default function ProductListPage() {
               setMinPrice={setMinPrice}
               maxPrice={maxPrice}
               setMaxPrice={setMaxPrice}
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
+              // searchTerm={searchTerm}
+              // setSearchTerm={setSearchTerm}
               sortBy={sortBy}
               setSortBy={setSortBy}
               setVisibleCount={setVisibleCount}
@@ -105,8 +113,8 @@ export default function ProductListPage() {
             setMinPrice={setMinPrice}
             maxPrice={maxPrice}
             setMaxPrice={setMaxPrice}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
+            // searchTerm={searchTerm}
+            // setSearchTerm={setSearchTerm}
             sortBy={sortBy}
             setSortBy={setSortBy}
             setVisibleCount={setVisibleCount}
@@ -160,7 +168,7 @@ export default function ProductListPage() {
 function Filters({
   minPrice, setMinPrice,
   maxPrice, setMaxPrice,
-  searchTerm, setSearchTerm,
+  // searchTerm, setSearchTerm,
   sortBy, setSortBy,
   setVisibleCount
 }: {
@@ -168,8 +176,8 @@ function Filters({
   setMinPrice: (val: number | '') => void,
   maxPrice: number | '',
   setMaxPrice: (val: number | '') => void,
-  searchTerm: string,
-  setSearchTerm: (val: string) => void,
+  // searchTerm: string,
+  // setSearchTerm: (val: string) => void,
   sortBy: string,
   setSortBy: (val: string) => void,
   setVisibleCount: (val: number) => void
@@ -207,16 +215,7 @@ function Filters({
         </div>
 
 
-        <div className="mb-6">
-          <h3 className="font-semibold mb-2">Search</h3>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search products..."
-            className="w-full border px-3 py-1 rounded text-sm"
-          />
-        </div>
+        
 
         <div>
           <h3 className="font-semibold mb-2">Sort by</h3>

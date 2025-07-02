@@ -87,23 +87,40 @@ export default function ProductListPage() {
 
       {/* Mobile Slide Panel */}
       {showFilters && (
-        <div className="fixed inset-0 z-40 bg-amber-100 md:hidden mt-48">
-          <div className="absolute top-0 left-0 w-3/4 h-full bg-white p-4 overflow-y-auto transition-transform duration-300 ease-in-out">
-            <button onClick={() => setShowFilters(false)} className="mb-4 font-bold text-red-500">Close</button>
-            <Filters
-              minPrice={minPrice}
-              setMinPrice={setMinPrice}
-              maxPrice={maxPrice}
-              setMaxPrice={setMaxPrice}
-              // searchTerm={searchTerm}
-              // setSearchTerm={setSearchTerm}
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-              setVisibleCount={setVisibleCount}
-            />
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-40 z-40"
+            onClick={() => setShowFilters(false)}
+          />
+
+          {/* Slide Panel */}
+          <div className="fixed top-0 right-0 w-4/5 h-full bg-white z-50 shadow-lg transform translate-x-0 transition-transform duration-300 ease-in-out">
+            <div className="flex items-center justify-between px-4 py-3 border-b">
+              <h2 className="text-lg font-semibold">Filters</h2>
+              <button
+                onClick={() => setShowFilters(false)}
+                className="text-red-500 text-sm font-semibold hover:underline"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="p-4 overflow-y-auto h-[calc(100%-56px)]">
+              <Filters
+                minPrice={minPrice}
+                setMinPrice={setMinPrice}
+                maxPrice={maxPrice}
+                setMaxPrice={setMaxPrice}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+                setVisibleCount={setVisibleCount}
+              />
+            </div>
           </div>
-        </div>
+        </>
       )}
+
 
       <div className="grid md:grid-cols-4 gap-8">
         {/* Filters Sidebar */}
@@ -215,7 +232,7 @@ function Filters({
         </div>
 
 
-        
+
 
         <div>
           <h3 className="font-semibold mb-2">Sort by</h3>

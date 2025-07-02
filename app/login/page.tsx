@@ -1,14 +1,34 @@
 'use client'
 
-import { useState } from 'react'
+import { useAuth } from '@/context/AuthContext'
+import { useState, useEffect } from 'react'
 import { FcGoogle } from 'react-icons/fc'
 
 export default function AuthPage() {
   const [mode, setMode] = useState<'login' | 'register'>('login')
+  const { login } = useAuth()
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
   const handleGoogleLogin = () => {
     // Integrate Google Auth logic here
     alert('Google login triggered')
+  }
+
+  const handleLogin = async () => {
+    const credentials = {
+      email: email, // Replace with actual username input  
+      password: password, // Replace with actual password input
+    }
+    try {
+      await login(credentials) // Replace 'google' with actual ref if needed
+      alert('Login successful')
+    } catch (error) {
+      console.error('Login failed:', error)
+      alert('Login failed. Please try again.')
+    }
   }
 
   return (
@@ -16,24 +36,22 @@ export default function AuthPage() {
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
         <div className="flex justify-between mb-6">
           <button
-            className={`w-1/2 py-2 font-semibold rounded-l ${
-              mode === 'login' ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600'
-            }`}
+            className={`w-1/2 py-2 font-semibold rounded-l ${mode === 'login' ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600'
+              }`}
             onClick={() => setMode('login')}
           >
             Login
           </button>
           <button
-            className={`w-1/2 py-2 font-semibold rounded-r ${
-              mode === 'register' ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600'
-            }`}
+            className={`w-1/2 py-2 font-semibold rounded-r ${mode === 'register' ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-600'
+              }`}
             onClick={() => setMode('register')}
           >
             Register
           </button>
         </div>
 
-        <form onSubmit={(e) => e.preventDefault()}>
+        <div>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
@@ -41,6 +59,8 @@ export default function AuthPage() {
               required
               className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-red-500"
               placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
 
@@ -51,6 +71,8 @@ export default function AuthPage() {
               required
               className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-red-500"
               placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
@@ -62,6 +84,8 @@ export default function AuthPage() {
                 required
                 className="w-full border rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-red-500"
                 placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
           )}
@@ -69,6 +93,7 @@ export default function AuthPage() {
           <button
             type="submit"
             className="w-full bg-red-500 hover:bg-pink-600 text-white text-sm font-semibold py-2 rounded mb-4"
+            onClick={handleLogin}
           >
             {mode === 'login' ? 'Login' : 'Create Account'}
           </button>
@@ -83,7 +108,7 @@ export default function AuthPage() {
             <FcGoogle className="text-xl" />
             Continue with Google
           </button>
-        </form>
+        </div>
       </div>
     </div>
   )

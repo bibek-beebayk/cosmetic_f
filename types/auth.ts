@@ -1,7 +1,6 @@
 export interface User {
-    id: string;
     email: string;
-    username?: string;
+    id?: string;
 }
 
 export interface AuthTokens {
@@ -10,7 +9,7 @@ export interface AuthTokens {
 }
 
 export interface LoginCredentials {
-    username: string;
+    email: string;
     password: string;
 }
 

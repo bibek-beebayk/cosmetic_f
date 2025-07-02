@@ -1,4 +1,4 @@
-export type Banner  = {
+export type Banner = {
   title: string
   image: string
   link: string | null
@@ -25,4 +25,13 @@ export type CategoryData = {
   image: string
   description: string
   parent: string | null
+}
+
+export type PaginationType = {
+  count: number
+  next: string | null
+  page: number
+  pages: number
+  previous: string | null
+  size: number
 }

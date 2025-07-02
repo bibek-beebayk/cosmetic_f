@@ -5,9 +5,13 @@ import { useState } from 'react'
 import { FaHeart, FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes } from 'react-icons/fa'
 import { CiSearch } from 'react-icons/ci'
 import Link from 'next/link'
+import { useAuth } from '@/context/AuthContext'
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const {isAuthenticated} = useAuth()
+
+  console.log('isAuthenticated:', isAuthenticated)
 
   const navItems = [
     { title: 'New' },
@@ -30,7 +34,7 @@ export default function Header() {
         {/* Topbar */}
         <div className="w-full bg-black text-white text-[11px] md:text-xs py-2 px-4 flex flex-col md:flex-row justify-between gap-2 md:gap-0">
           <div className="flex flex-wrap justify-center md:justify-start gap-4">
-            <a href="#" className="hover:underline">Log In/Sign Up</a>
+            <a href="/login" className="hover:underline">Log In/Sign Up</a>
             <a href="#" className="hover:underline">Beauty Pass</a>
           </div>
           <div className="flex flex-wrap justify-center md:justify-end gap-4">

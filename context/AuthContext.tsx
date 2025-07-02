@@ -100,22 +100,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const userData: User = {
                 id: response.id,
                 email: response.email,
-                username: response.username,
             }
 
-            // const siteSettings: SiteSettings = {
-            //     colorMode: "dark"
-            // }
             
             setTokens(authTokens);
-            setUser(response);
+            setUser(userData);
             setIsAuthenticated(true);
 
             localStorage.setItem('auth_tokens', JSON.stringify(authTokens));
             localStorage.setItem('user_data', JSON.stringify(userData));
-            // localStorage.setItem('site_settings', JSON.stringify(siteSettings));
 
-            router.push('/admin');
+            router.push('/');
+
         } catch (error) {
             console.error('Login error:', error);
             throw error;

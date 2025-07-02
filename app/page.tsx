@@ -9,6 +9,7 @@ import ShopByCategory from '@/sections/ShopByCategory'
 import {useEffect, useState} from 'react'
 import {apiCall} from '@/lib/axios'
 import { Banner, BrandData, CategoryData, ProductList } from '@/types/core'
+import LoadingSpinner from '@/components/LoadingSpinner'
 
 type HomepageData = {
   banners: Banner[]
@@ -34,6 +35,10 @@ export default function Home() {
 
     fetchHomepageData();
   }, []);
+
+  if (!homepageData) {
+    return <LoadingSpinner/>;
+  }
 
   return (
     <main>

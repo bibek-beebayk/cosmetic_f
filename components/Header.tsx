@@ -6,10 +6,19 @@ import { FaHeart, FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes } from 'react-
 import { CiSearch } from 'react-icons/ci'
 import Link from 'next/link'
 import { useAuth } from '@/context/AuthContext'
+import {useNavMenu} from '@/hooks/useNavMenu'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const {isAuthenticated} = useAuth()
+  const {data = []} = useNavMenu()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const category = searchParams.get('category') 
+
+  console.log("Data: ", data)
 
   console.log('isAuthenticated:', isAuthenticated)
 
@@ -89,16 +98,17 @@ export default function Header() {
       <nav className="sticky top-0 z-50 bg-white border-b">
         {/* Desktop Menu */}
         <div className="max-w-7xl mx-auto px-4 py-2 hidden md:flex gap-6 text-sm font-medium text-gray-700 justify-center">
-          {navItems.map((item, i) => (
+          {data.map((item, i) => (
+
             <div key={i} className="relative group">
-              <a href="#" className="hover:text-primary transition whitespace-nowrap">
+              <a href={item.link} className={`hover:text-primary transition whitespace-nowrap ${item.link.split("=")[1] == category ? "text-red-600" : "text-black" }`}>
                 {item.title}
               </a>
-              {item.submenu && (
+              {item.submenu && item.submenu.length > 0 && (
                 <div className="absolute top-full left-0 hidden group-hover:block bg-white shadow-md border mt-2 py-2 px-4">
                   {item.submenu.map((sub, j) => (
-                    <Link key={j} href="#" className="block py-1 px-2 hover:text-primary">
-                      {sub}
+                    <Link key={j} href={sub.link} className="block py-1 px-2 hover:text-primary">
+                      {sub.title}
                     </Link>
                   ))}
                 </div>

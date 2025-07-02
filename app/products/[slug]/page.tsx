@@ -1,5 +1,6 @@
 'use client'
 
+import LoadingSpinner from '@/components/LoadingSpinner'
 import { apiCall } from '@/lib/axios'
 import { ProductData } from '@/types/product'
 import { useParams } from 'next/navigation'
@@ -29,7 +30,7 @@ export default function ProductDetailsPage() {
     fetchProductData()
   }, [slug])
 
-  if (!productData) return <div className="py-10 px-4">Loading...</div>
+  if (!productData) return <LoadingSpinner />
 
   const images = productData.images.map((img) => img.image)
 

@@ -1,9 +1,11 @@
 'use client'
 
+import LoadingSpinner from '@/components/LoadingSpinner'
 import Pagination from '@/components/Pagination'
 import ProductCard from '@/components/ProductCard'
 import { apiCall } from '@/lib/axios'
 import { PaginationType, ProductList } from '@/types/core'
+import { useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { FaFilter } from 'react-icons/fa'
 
@@ -33,7 +35,11 @@ export default function ProductListPage() {
   const [page, setPage] = useState(1)
   const [minPrice, setMinPrice] = useState<number | ''>('')
   const [maxPrice, setMaxPrice] = useState<number | ''>('')
+  
+  const searchParams = useSearchParams();
 
+  const category = searchParams.get("category")
+  console.log("Category: ", category)
 
   const requestParams = {
     min_price: minPrice || undefined,
@@ -41,6 +47,7 @@ export default function ProductListPage() {
     search: searchTerm,
     sort: sortBy,
     page: page,
+    category: category
   }
 
 
@@ -58,6 +65,8 @@ export default function ProductListPage() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [page]);
+
+  if (!products) return <LoadingSpinner />
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">

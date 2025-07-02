@@ -3,6 +3,7 @@
 import LoadingSpinner from '@/components/LoadingSpinner'
 import Pagination from '@/components/Pagination'
 import ProductCard from '@/components/ProductCard'
+import { addToCart, toggleWishlist } from '@/lib/api/product'
 import { apiCall } from '@/lib/axios'
 import { PaginationType, ProductList } from '@/types/core'
 import { useSearchParams } from 'next/navigation'
@@ -40,6 +41,8 @@ export default function ProductListPage() {
   const search = searchParams.get('search') || ''
   const category = searchParams.get('category') || ''
 
+  const [wishListToggled, setWishListToggled] = useState(false)
+
   console.log("Category: ", category)
 
   // useEffect(() => {
@@ -68,7 +71,7 @@ export default function ProductListPage() {
       setPagination(res.pagination)
     }
     fetchProducts()
-  }, [minPrice, maxPrice, sortBy, page, search, category])
+  }, [minPrice, maxPrice, sortBy, page, search, category, wishListToggled])
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -144,7 +147,27 @@ export default function ProductListPage() {
             <p className="text-gray-500 text-sm col-span-full">No products found.</p>
           ) : (
             products?.map((p) => (
-              <ProductCard product={p} key={p.slug} />
+              <ProductCard
+                product={p}
+                key={p.slug}
+                onWishlistToggle={async () => {
+                  try {
+                    await toggleWishlist(p.id)
+                    setWishListToggled((prev) => !prev)
+                    // Optionally update local product state here
+                  } catch (err) {
+                    console.error('Wishlist toggle failed', err)
+                  }
+                }}
+                onAddToCart={async () => {
+                  try {
+                    await addToCart(p.id)
+                    // Optionally show toast/snackbar
+                  } catch (err) {
+                    console.error('Add to cart failed', err)
+                  }
+                }}
+              />
             ))
           )}
         </div>

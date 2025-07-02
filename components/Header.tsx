@@ -1,6 +1,7 @@
 // Header.tsx
 'use client'
 
+import { useAuth } from '@/context/AuthContext'
 import { useNavMenu } from '@/hooks/useNavMenu'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -14,6 +15,9 @@ export default function Header() {
   const searchParams = useSearchParams()
   const [searchTerm, setSearchTerm] = useState('')
   const router = useRouter()
+  const { isAuthenticated, logout } = useAuth()
+
+  console.log("Is Authenticated: ", isAuthenticated)
 
   const category = searchParams.get('category')
 
@@ -23,6 +27,11 @@ export default function Header() {
     }
   }
 
+  const handleLogOutClick = () => {
+    logout()
+    router.push('/')
+  }
+
   return (
     <>
       {/* Header Top (not sticky) */}
@@ -30,7 +39,13 @@ export default function Header() {
         {/* Topbar */}
         <div className="w-full bg-black text-white text-[11px] md:text-xs py-2 px-4 flex flex-col md:flex-row justify-between gap-2 md:gap-0">
           <div className="flex flex-wrap justify-center md:justify-start gap-4">
-            <a href="/login" className="hover:underline">Log In/Sign Up</a>
+            {isAuthenticated ? (
+              <>
+                <div className="hover:underline" onClick={handleLogOutClick}>Logout</div>
+                {/* <a href="#" className="hover:underline">My Orders</a> */}
+              </>
+            ) : <a href="/login" className="hover:underline">Log In/Sign Up</a>}
+
             <a href="#" className="hover:underline">Beauty Pass</a>
           </div>
           <div className="flex flex-wrap justify-center md:justify-end gap-4">
@@ -38,10 +53,10 @@ export default function Header() {
               <FaMapMarkerAlt className="text-[12px]" /> Store & Events
             </a>
             <a href="#" className="hover:underline">Book Beauty Services</a>
-            <a href="/wishlist" className="hover:underline flex items-center gap-1">
+            <a href={isAuthenticated ? "/wishlist" : "/login"} className="hover:underline flex items-center gap-1">
               <FaHeart className="text-[12px]" /> Wish List
             </a>
-            <a href="/cart" className="hover:underline flex items-center gap-1">
+            <a href={isAuthenticated ? "/cart" : "/login"} className="hover:underline flex items-center gap-1">
               <FaShoppingCart className="text-[12px]" /> Cart
             </a>
           </div>

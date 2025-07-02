@@ -5,12 +5,14 @@ export type Banner = {
 }
 
 export type ProductList = {
+  id: number
   name: string
   slug: string
   image: string
   price: number
   rating: number
   brand: string
+  is_in_wishlist: boolean
 }
 
 export type BrandData = {

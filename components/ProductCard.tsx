@@ -26,7 +26,7 @@ export default function ProductCard({
       {showWishlist && (
         <button
           onClick={onWishlistToggle}
-          className="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-lg z-10"
+          className={`absolute top-3 right-3 hover:text-red-200 text-lg z-10 ${product.is_in_wishlist ? "text-red-500" : "text-gray-400"}`}
         >
           <FaHeart />
         </button>

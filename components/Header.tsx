@@ -19,7 +19,7 @@ export default function Header() {
 
   const handleSearch = () => {
     if (searchTerm) {
-      router.push(`/products/?search=${searchTerm}`)
+      router.push(`/products/?search=${searchTerm}&category=all`)
     }
   }
 

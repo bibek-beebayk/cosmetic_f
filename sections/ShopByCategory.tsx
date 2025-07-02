@@ -1,6 +1,7 @@
 'use client'
 
 import { CategoryData } from "@/types/core"
+import Link from "next/link"
 
 // const categories = [
 //   { title: 'Skincare', image: '/categories/skincare.jpg' },
@@ -21,7 +22,7 @@ export default function ShopByCategory({categories = [] }: Props) {
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {categories.map((cat, i) => (
-          <a key={i} href="#" className="group relative overflow-hidden rounded-lg shadow hover:shadow-lg transition-all">
+          <Link key={i} href={`/products/?category=${cat.slug}`} className="group relative overflow-hidden rounded-lg shadow hover:shadow-lg transition-all">
             <img
               src={cat.image}
               alt={cat.name}
@@ -31,7 +32,7 @@ export default function ShopByCategory({categories = [] }: Props) {
             <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center text-white text-lg font-semibold opacity-0 group-hover:opacity-70 transition-opacity">
               {cat.name}
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </section>

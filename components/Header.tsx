@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { FaHeart,  FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes } from 'react-icons/fa'
+import { FaHeart, FaShoppingCart, FaMapMarkerAlt, FaBars, FaTimes } from 'react-icons/fa'
 import { CiSearch } from 'react-icons/ci'
 import Link from 'next/link'
 
@@ -24,7 +24,8 @@ export default function Header() {
   ]
 
   return (
-    <header className="w-full sticky top-0 z-50 bg-white border-b shadow-sm">
+    // <header className="w-full sticky top-0 z-50 bg-white border-b shadow-sm">
+    <header className="w-full z-50 bg-white border-b shadow-sm">
       {/* Topbar */}
       <div className="w-full bg-black text-white text-[11px] md:text-xs py-2 px-4 flex flex-col md:flex-row justify-between gap-2 md:gap-0">
         <div className="flex flex-wrap justify-center md:justify-start gap-4">
@@ -48,7 +49,9 @@ export default function Header() {
       {/* Main Header */}
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between py-3 px-4 gap-4 relative">
         {/* Logo */}
-        <img src="/logo.png" alt="Logo" className="h-12 object-contain" />
+        <Link href={"/"}>
+          <img src="/logo.png" alt="Logo" className="h-12 object-contain" />
+        </Link>
 
         {/* Search */}
         <div className="w-full md:flex-1 relative max-w-xl">

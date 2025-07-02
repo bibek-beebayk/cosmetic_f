@@ -1,26 +1,43 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination, Navigation } from 'swiper/modules'
+import { Swiper as SwiperType } from 'swiper/types'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/navigation'
+import { Banner } from '@/types/core'
 
-const banners = [
-  { id: 1, image: '/banners/banner1.jpg', alt: 'New arrivals' },
-  { id: 2, image: '/banners/banner2.jpg', alt: 'Best sellers' },
-  { id: 3, image: '/banners/banner3.jpg', alt: 'Fragrance offers' },
-]
+type Props = {
+  banners?: Banner[]
+}
 
-export default function HeroSlider() {
-  const prevRef = useRef(null)
-  const nextRef = useRef(null)
+export default function HeroSlider({ banners = [] }: Props) {
+  const prevRef = useRef<HTMLButtonElement | null>(null)
+  const nextRef = useRef<HTMLButtonElement | null>(null)
+  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null)
+
+  useEffect(() => {
+    if (
+      swiperInstance &&
+      swiperInstance.params.navigation &&
+      typeof swiperInstance.params.navigation !== 'boolean'
+    ) {
+      swiperInstance.params.navigation.prevEl = prevRef.current
+      swiperInstance.params.navigation.nextEl = nextRef.current
+      swiperInstance.navigation.init()
+      swiperInstance.navigation.update()
+    }
+  }, [swiperInstance])
+
+  const hasEnoughSlides = banners.length > 1
 
   return (
-    <div className="w-full max-w-[100vw] overflow-hidden relative">
+    <div className="relative w-full max-w-[100vw] overflow-hidden">
       <Swiper
         modules={[Autoplay, Pagination, Navigation]}
+        loop={hasEnoughSlides}
         autoplay={{ delay: 4000, disableOnInteraction: false }}
         pagination={{ clickable: true }}
         navigation={{
@@ -28,38 +45,44 @@ export default function HeroSlider() {
           nextEl: nextRef.current,
         }}
         onBeforeInit={(swiper) => {
-        //   if (typeof swiper.params.navigation !== 'boolean') {
-        //     swiper.params.navigation.prevEl = prevRef.current
-        //     swiper.params.navigation.nextEl = nextRef.current
-        //   }
+          // This ensures refs are assigned *before* Swiper tries to use them
+          // if (typeof swiper.params.navigation !== 'boolean') {
+          //   swiper.params.navigation.prevEl = prevRef.current
+          //   swiper.params.navigation.nextEl = nextRef.current
+          // }
         }}
-        loop
+        onSwiper={setSwiperInstance}
         className="w-full h-full"
       >
         {banners.map((slide) => (
-          <SwiperSlide key={slide.id}>
+          <SwiperSlide key={slide.title}>
             <img
               src={slide.image}
-              alt={slide.alt}
+              alt={slide.title}
               className="w-full h-[250px] md:h-[500px] object-cover"
             />
           </SwiperSlide>
         ))}
-
-        {/* Custom Navigation Buttons */}
-        <button
-          ref={prevRef}
-          className="swiper-button-prev absolute left-2 top-1/2 z-10 text-black text-xl -translate-y-1/2"
-        >
-          ‹
-        </button>
-        <button
-          ref={nextRef}
-          className="swiper-button-next absolute right-2 top-1/2 z-10 text-black text-xl -translate-y-1/2"
-        >
-          ›
-        </button>
       </Swiper>
+
+      {/* {hasEnoughSlides && (
+        <>
+          <button
+            ref={prevRef}
+            className="swiper-button-prev absolute left-2 top-1/2 z-10 text-black text-2xl -translate-y-1/2"
+            aria-label="Previous"
+          >
+            ‹
+          </button>
+          <button
+            ref={nextRef}
+            className="swiper-button-next absolute right-2 top-1/2 z-10 text-black text-2xl -translate-y-1/2"
+            aria-label="Next"
+          >
+            ›
+          </button>
+        </>
+      )} */}
     </div>
   )
 }

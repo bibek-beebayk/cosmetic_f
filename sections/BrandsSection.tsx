@@ -3,17 +3,14 @@
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay } from 'swiper/modules'
 import 'swiper/css'
+import { BrandData } from '@/types/core'
 
-const brands = [
-  '/brands/brand1.png',
-  '/brands/brand2.png',
-  '/brands/brand3.png',
-  '/brands/brand1.png',
-  '/brands/brand2.png',
-  '/brands/brand3.png',
-]
 
-export default function BrandsSection() {
+type Props = {
+  brands? : BrandData[]
+}
+
+export default function BrandsSection({ brands = [] }: Props) {
   return (
     <section className="py-10 px-4 bg-indigo-200">
       <h2 className="text-2xl font-semibold mb-6 text-center">Shop by Brand</h2>
@@ -30,11 +27,11 @@ export default function BrandsSection() {
         loop
         modules={[Autoplay]}
       >
-        {brands.map((src, i) => (
-          <SwiperSlide key={i} className="flex items-center justify-center">
+        {brands.map((brand, i) => (
+          <SwiperSlide key={brand.slug} className="flex items-center justify-center">
             <img
-              src={src}
-              alt={`Brand ${i + 1}`}
+              src={brand.logo}
+              alt={`Brand ${brand.name}`}
               className="h-16 object-contain grayscale hover:grayscale-0 transition duration-300 border rounded-lg shadow-md hover:shadow-lg"
             />
           </SwiperSlide>

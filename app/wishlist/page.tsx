@@ -4,6 +4,7 @@ import { toggleWishlist } from '@/lib/api/product'
 import { apiCall } from '@/lib/axios'
 import { ProductList } from '@/types/core'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { FaTrash } from 'react-icons/fa'
 
 const wishlistItems = [
@@ -41,7 +42,8 @@ export default function WishlistPage() {
 
   const handleDelete = async (id: number) => {
     try {
-      await toggleWishlist(id)
+      const res = await toggleWishlist(id)
+      toast.success(res.message)
       setToggle((prev) => !prev)
       // Optionally update local product state here
     } catch (err) {
@@ -53,8 +55,8 @@ export default function WishlistPage() {
     <div className="max-w-7xl mx-auto px-4 py-10">
       <h1 className="text-2xl font-semibold mb-6">My Wishlist</h1>
 
-      {wishlistItems.length === 0 ? (
-        <p>Your wishlist is empty.</p>
+      {wishList?.length === 0 ? (
+        <h3>Your wishlist is empty.</h3>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {wishList?.map((item) => (

@@ -3,6 +3,7 @@ import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import { Poppins } from 'next/font/google'
 import './globals.css'
+import { Toaster } from 'react-hot-toast'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -25,6 +26,9 @@ export default function RootLayout({
       <body className="bg-white text-gray-900 font-sans">
         <Providers>
           <Header />
+          <div>
+            <Toaster />
+          </div>
           {children}
           <Footer />
         </Providers>

@@ -1,7 +1,11 @@
 import { apiCall } from '../axios'
 
+type WishlistResponse = {
+    message: string
+  }
+
 export const toggleWishlist = async (productId: number) => {
-  return apiCall('post', `/wishlist/toggle/`, { product_id: productId })
+  return apiCall<WishlistResponse>('post', `/wishlist/toggle/`, { product_id: productId })
 }
 
 export const addToCart = async (productId: number, quantity = 1) => {

@@ -8,6 +8,7 @@ import { apiCall } from '@/lib/axios'
 import { PaginationType, ProductList } from '@/types/core'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { FaFilter } from 'react-icons/fa'
 
 
@@ -152,11 +153,14 @@ export default function ProductListPage() {
                 key={p.slug}
                 onWishlistToggle={async () => {
                   try {
-                    await toggleWishlist(p.id)
+                    const res = await toggleWishlist(p.id)
+                    console.log("Res: ", res)
+                    toast.success(res.message)
                     setWishListToggled((prev) => !prev)
                     // Optionally update local product state here
                   } catch (err) {
                     console.error('Wishlist toggle failed', err)
+                    toast.error("An error occured.")
                   }
                 }}
                 onAddToCart={async () => {

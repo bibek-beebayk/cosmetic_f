@@ -21,10 +21,6 @@ export default function ProductDetailsPage() {
   const [selectedShadeId, setSelectedShadeId] = useState<number | null>(null)
   const [availableQuantity, setAvailableQuantity] = useState<number>(0)
 
-  // useEffect(()=>{
-
-  // }, [selectedVariantId, selectedShadeId])
-
   useEffect(() => {
     const fetchProductData = async () => {
       try {

@@ -5,7 +5,7 @@ import Pagination from '@/components/Pagination'
 import ProductCard from '@/components/ProductCard'
 import { addToCart, toggleWishlist } from '@/lib/api/product'
 import { apiCall } from '@/lib/axios'
-import { PaginationType, ProductList } from '@/types/core'
+import { BrandData, PaginationType, ProductList } from '@/types/core'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -37,6 +37,9 @@ export default function ProductListPage() {
   const [page, setPage] = useState(1)
   const [minPrice, setMinPrice] = useState<number | ''>('')
   const [maxPrice, setMaxPrice] = useState<number | ''>('')
+  const [brands, setBrands] = useState<BrandData[] | []>([])
+  const [selectedBrand, setSelectedBrand] = useState<string | "">("")
+
 
   const searchParams = useSearchParams();
   const search = searchParams.get('search') || ''
@@ -46,20 +49,14 @@ export default function ProductListPage() {
 
   console.log("Category: ", category)
 
-  // useEffect(() => {
-  //   const search = searchParams.get("search")
-  //   if (search) {
-  //     setSearchTerm(search)
-  //   }
-  // }, [searchParams])
-
   const requestParams = {
     min_price: minPrice || undefined,
     max_price: maxPrice || undefined,
     search: search || undefined,
     sort: sortBy,
     page: page,
-    category: category || undefined
+    category: category || undefined,
+    brand: selectedBrand || undefined,
   }
 
 
@@ -72,7 +69,16 @@ export default function ProductListPage() {
       setPagination(res.pagination)
     }
     fetchProducts()
-  }, [minPrice, maxPrice, sortBy, page, search, category, wishListToggled])
+  }, [minPrice, maxPrice, sortBy, page, search, category, wishListToggled, selectedBrand])
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      const res = await apiCall<BrandData[]>('get', '/brand/')
+      console.log('Fetched brands:', res)
+      setBrands(res)
+    }
+    fetchBrands()
+  }, []) // Empty dependency array to run only on component mont and unmo
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -119,6 +125,9 @@ export default function ProductListPage() {
                 sortBy={sortBy}
                 setSortBy={setSortBy}
                 setVisibleCount={setVisibleCount}
+                brands={brands}
+                selectedBrand={selectedBrand}
+                setSelectedBrand={setSelectedBrand}
               />
             </div>
           </div>
@@ -139,6 +148,9 @@ export default function ProductListPage() {
             sortBy={sortBy}
             setSortBy={setSortBy}
             setVisibleCount={setVisibleCount}
+            brands={brands}
+            selectedBrand={selectedBrand}
+            setSelectedBrand={setSelectedBrand}
           />
         </aside>
 
@@ -212,24 +224,40 @@ export default function ProductListPage() {
 function Filters({
   minPrice, setMinPrice,
   maxPrice, setMaxPrice,
-  // searchTerm, setSearchTerm,
   sortBy, setSortBy,
-  setVisibleCount
+  setVisibleCount,
+  brands,
+  selectedBrand,
+  setSelectedBrand,
 }: {
   minPrice: number | '',
   setMinPrice: (val: number | '') => void,
   maxPrice: number | '',
   setMaxPrice: (val: number | '') => void,
-  // searchTerm: string,
-  // setSearchTerm: (val: string) => void,
   sortBy: string,
   setSortBy: (val: string) => void,
   setVisibleCount: (val: number) => void
+  brands: BrandData[]
+  selectedBrand: string | ""
+  setSelectedBrand: (val: string) => void
 }) {
   {
     return (
       <div>
-        <div className="mb-6">
+        <div>
+          <h3 className="font-semibold mb-2">Sort by</h3>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="w-full border px-2 py-1 text-sm rounded"
+          >
+            {sortOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mt-4">
           <h3 className="font-semibold mb-2">Price Range</h3>
           <div className="flex items-center gap-3">
             <input
@@ -258,21 +286,20 @@ function Filters({
           </div>
         </div>
 
-
-
-
-        <div>
-          <h3 className="font-semibold mb-2">Sort by</h3>
+        <div className="mt-4">
+          <h3 className="font-semibold mb-2">Brand</h3>
           <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            value={selectedBrand}
+            onChange={(e) => setSelectedBrand(e.target.value)}
             className="w-full border px-2 py-1 text-sm rounded"
           >
-            {sortOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            <option value="">All Brands</option>
+            {brands.map((brand) => (
+              <option key={brand.slug} value={brand.slug}>{brand.name}</option>
             ))}
           </select>
         </div>
+
       </div>
     )
   }

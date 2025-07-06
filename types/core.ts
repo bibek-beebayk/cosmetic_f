@@ -16,6 +16,7 @@ export type ProductList = {
 }
 
 export type BrandData = {
+  id: number
   name: string
   slug: string
   logo: string

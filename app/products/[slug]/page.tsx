@@ -1,20 +1,29 @@
 'use client'
 
 import LoadingSpinner from '@/components/LoadingSpinner'
+import { addToCart, toggleWishlist } from '@/lib/api/product'
 import { apiCall } from '@/lib/axios'
 import { ProductData } from '@/types/product'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { FaHeart, FaRegStar, FaStar, FaStarHalfAlt } from 'react-icons/fa'
 
 export default function ProductDetailsPage() {
   const { slug } = useParams()
   const [productData, setProductData] = useState<ProductData>()
-  const [selectedVariant, setSelectedVariant] = useState<number>(0)
   const [quantity, setQuantity] = useState(1)
   const [mainImage, setMainImage] = useState<string>()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [modalIndex, setModalIndex] = useState(0)
+  const [wishListToggled, setWishListToggled] = useState(false)
+  const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null)
+  const [selectedShadeId, setSelectedShadeId] = useState<number | null>(null)
+  const [availableQuantity, setAvailableQuantity] = useState<number>(0)
+
+  // useEffect(()=>{
+
+  // }, [selectedVariantId, selectedShadeId])
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -22,13 +31,34 @@ export default function ProductDetailsPage() {
         const data = await apiCall<ProductData>('get', `/product/${slug}/`)
         setProductData(data)
         setMainImage(data?.images?.[0]?.image)
+
+        if (data.variants.length > 0) {
+          setSelectedVariantId(data.variants[0].id)
+        }
+
+        if (data.shades.length > 0) {
+          setSelectedShadeId(data.shades[0].id)
+        }
       } catch (error) {
         console.error('Error fetching product data:', error)
       }
     }
 
     fetchProductData()
-  }, [slug])
+  }, [slug, wishListToggled])
+
+
+  const selectedVariant = productData?.variants.find(v => v.id === selectedVariantId)
+  const selectedShade = productData?.shades.find(s => s.id === selectedShadeId)
+
+
+  useEffect(() => {
+    console.log("Selected Variant: ", selectedVariant)
+    console.log("Selected Shade: ", selectedShade)
+    console.log("Selected Quantity: ", quantity)
+    console.log("Available Quantity: ", availableQuantity)
+    if (selectedShade) setAvailableQuantity(selectedShade.stock)
+  }, [selectedVariant, selectedShade, quantity])
 
   if (!productData) return <LoadingSpinner />
 
@@ -44,6 +74,19 @@ export default function ProductDetailsPage() {
     const newIndex = modalIndex === images.length - 1 ? 0 : modalIndex + 1
     setModalIndex(newIndex)
     setMainImage(images[newIndex])
+  }
+
+  const handleAddToCart = async () => {
+
+    try{
+      console.log("Add To Cart Button clicked")
+      const response = await addToCart(productData.id, quantity, selectedShade?.id, selectedVariant?.id)
+      console.log("Response: ",response)
+      toast.success("Added to cart")
+
+    } catch(error){
+      console.error(error)
+    }
   }
 
   return (
@@ -99,60 +142,42 @@ export default function ProductDetailsPage() {
 
           {/* Price */}
           <p className="text-xl font-semibold text-gray-900 mb-4">
-            {productData.variants.length > 0
-              ? `$${productData.variants[selectedVariant].price}`
-              : productData.shades.length > 0 && productData.variants.length > selectedVariant
-                ? `$${productData.variants[selectedVariant].price}`
-                : `$${productData.price}`
-            }
+            {selectedVariant ? `$${selectedVariant.price}` : `$${productData.price}`}
           </p>
 
+
+
           {/* Variant Swatches (Shades) */}
-          {productData.shades.length > 0 && (
-            <div className="mb-4">
-              <h3 className="text-sm  mb-2">Shade: <span className='text-red-500'>{productData.shades[selectedVariant].name}</span></h3>
-              <div className="flex gap-2">
-                {productData.shades.map((shade, i) => (
-                  <button
-                    key={shade.name}
-                    title={shade.name}
-                    onClick={() => setSelectedVariant(i)}
-                    className={`w-8 h-8 rounded-full border-2 cursor-pointer ${selectedVariant === i ? 'border-black scale-110' : 'border-gray-300'
-                      }`}
-                    style={{ backgroundColor: shade.hex_code }}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+          {productData.shades.length > 0 && <h3 className="text-sm mb-2">
+            Shade: <span className="text-red-500">{selectedShade?.name}</span>
+          </h3>}
+          {productData.shades.map((shade) => (
+            <button
+              key={shade.id}
+              title={shade.name}
+              onClick={() => setSelectedShadeId(shade.id)}
+              className={`w-8 h-8 mr-1 rounded-full border-2 cursor-pointer ${selectedShadeId === shade.id ? 'border-black scale-110' : 'border-gray-300'}`}
+              style={{ backgroundColor: shade.hex_code }}
+            />
+          ))}
+
 
           {/* Variant Swatches (Variations) */}
-          {productData.variants.length > 0 && (
-            <div className="mb-4">
-              <h3 className="text-sm font-semibold mb-2">Variants</h3>
-              <div className="flex gap-2">
-                {productData.variants.map((variant, i) => (
-                  // <img
-                  //   key={variant.name}
-                  //   src={variant.image}
-                  //   alt={variant.name}
-                  //   onClick={() => setSelectedVariant(i)}
-                  //   className={`w-6 h-6 rounded-full border-2 cursor-pointer ${selectedVariant === i ? 'border-black scale-110' : 'border-gray-300'}`}
-                  // />
-                  <div
-                    key={variant.name}
-                    className={`p-2 rounded border-2 cursor-pointer ${selectedVariant === i ? 'border-red-500 scale-110 bg-amber-100' : 'border-gray-300'}`}
-                    onClick={() => setSelectedVariant(i)}
-                  >
-                    {variant.name}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          {productData.variants.length > 0 && <h3 className="text-sm mb-2">
+            Variant: <span className="text-red-500">{selectedVariant?.name}</span>
+          </h3>}
+          {productData.variants.map((variant) => (
+            <span
+              key={variant.id}
+              className={`p-2 rounded border-2 cursor-pointer ${selectedVariantId === variant.id ? 'border-red-500 scale-110 bg-amber-100' : 'border-gray-300'} mr-2`}
+              onClick={() => setSelectedVariantId(variant.id)}
+            >
+              {variant.name}
+            </span>
+          ))}
 
           {/* Quantity */}
-          <div className="mb-4">
+          <div className="mb-4 mt-4">
             <label className="text-sm block mb-1">Qty</label>
             <select
               value={quantity}
@@ -166,10 +191,21 @@ export default function ProductDetailsPage() {
           </div>
 
           <div className="flex gap-3">
-            <button className="bg-red-500 text-white px-6 py-2 rounded hover:bg-pink-600 text-sm font-semibold">
-              Add to Bag
+            <button className="bg-red-500 text-white px-6 py-2 rounded hover:bg-pink-600 text-sm font-semibold" onClick={handleAddToCart}>
+              Add to Cart
             </button>
-            <button className="text-gray-500 hover:text-red-500 text-xl">
+            <button className={`text-gray-500 hover:text-red-200 text-xl ${productData.is_in_wishlist ? 'text-red-500' : 'text-gray-400'}`} onClick={async () => {
+              try {
+                const res = await toggleWishlist(productData.id)
+                console.log("Res: ", res)
+                toast.success(res.message)
+                setWishListToggled((prev) => !prev)
+                // Optionally update local product state here
+              } catch (err) {
+                console.error('Wishlist toggle failed', err)
+                toast.error("An error occured.")
+              }
+            }}>
               <FaHeart />
             </button>
           </div>

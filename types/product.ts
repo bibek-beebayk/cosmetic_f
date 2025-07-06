@@ -23,12 +23,16 @@ type Property = {
 }
 
 type Shade = {
+    id: number;
     name: string;
     hex_code: string;
     image: string;
+    sku: string;
+    stock: number;
 }
 
 type Variant = {
+    id: number;
     name: string;
     price: number;
     stock: number;
@@ -37,6 +41,7 @@ type Variant = {
 }
 
 export type ProductData = {
+    id:  number;
     name: string;
     slug: string;
     description: string;
@@ -50,4 +55,5 @@ export type ProductData = {
     properties: Property[] | [];
     shades: Shade[] | [];
     variants: Variant[] | [];
+    is_in_wishlist: boolean;
 }

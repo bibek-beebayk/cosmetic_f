@@ -6,6 +6,7 @@ import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import { Suspense } from 'react'
 import Header from '@/components/Header'
+import LoadingSpinner from '@/components/LoadingSpinner'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -27,7 +28,7 @@ export default function RootLayout({
     <html lang="en" className={`${poppins.variable}`}>
       <body className="bg-white text-gray-900 font-sans">
         <Providers>
-          <Suspense fallback={<div>Loading 404...</div>}>
+          <Suspense fallback={<LoadingSpinner />}>
 
             <Header />
             <div>

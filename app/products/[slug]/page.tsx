@@ -4,6 +4,7 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import { useAuth } from '@/context/AuthContext'
 import { addToCart, toggleWishlist } from '@/lib/api/product'
 import { apiCall } from '@/lib/axios'
+import { BasicResponse } from '@/types/core'
 import { ProductData } from '@/types/product'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -21,8 +22,11 @@ export default function ProductDetailsPage() {
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null)
   const [selectedShadeId, setSelectedShadeId] = useState<number | null>(null)
   const [availableQuantity, setAvailableQuantity] = useState<number>(0)
+  const [userRating, setUserRating] = useState<number>(0)
+  const [userComment, setUserComment] = useState<string>("")
   const router = useRouter()
   const { isAuthenticated } = useAuth()
+  const [refetch, setRefetch] = useState(false);
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -44,7 +48,7 @@ export default function ProductDetailsPage() {
     }
 
     fetchProductData()
-  }, [slug, wishListToggled])
+  }, [slug, wishListToggled, refetch])
 
 
   const selectedVariant = productData?.variants.find(v => v.id === selectedVariantId)
@@ -57,6 +61,7 @@ export default function ProductDetailsPage() {
     console.log("Selected Quantity: ", quantity)
     console.log("Available Quantity: ", availableQuantity)
     if (selectedShade) setAvailableQuantity(selectedShade.stock)
+    if (selectedVariant) setAvailableQuantity(selectedVariant.stock)
   }, [selectedVariant, selectedShade, quantity])
 
   if (!productData) return <LoadingSpinner />
@@ -88,6 +93,24 @@ export default function ProductDetailsPage() {
     } catch (error) {
       console.error(error)
     }
+  }
+
+  const handleReviewSubmit = async () => {
+    console.log("Review Submit clicked.")
+
+    try {
+      const res = await apiCall<BasicResponse>("post", `/product/${slug}/review/`, {
+        rating: userRating,
+        comment: userComment
+      })
+      toast.success(res.message)
+      setUserComment("")
+      setUserRating(0)
+      setRefetch(!refetch)
+    } catch (e) {
+      console.error(e)
+    }
+
   }
 
   return (
@@ -145,8 +168,6 @@ export default function ProductDetailsPage() {
           <p className="text-xl font-semibold text-gray-900 mb-4">
             {selectedVariant ? `$${selectedVariant.price}` : `$${productData.price}`}
           </p>
-
-
 
           {/* Variant Swatches (Shades) */}
           {productData.shades.length > 0 && <h3 className="text-sm mb-2">
@@ -241,6 +262,7 @@ export default function ProductDetailsPage() {
               />
             </div>
           )}
+
         </div>
       </div>
 
@@ -290,6 +312,60 @@ export default function ProductDetailsPage() {
           </div>
         </div>
       )}
+
+      <div className="mt-10">
+        <h3 className="text-lg font-semibold mb-2 uppercase">Customer Reviews</h3>
+
+        {isAuthenticated && (
+          <div className="mt-6 border-t pt-4 mb-6">
+            <h4 className="text-md font-medium">Write a Review</h4>
+            {productData.has_user_reviewed && <i className='text-xs mb-4 text-yellow-600'>Your existing review will be updated.</i>}
+            <div className="flex gap-1 text-yellow-500 mb-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <button key={i} onClick={() => setUserRating(i + 1)}>
+                  {i < userRating ? <FaStar /> : <FaRegStar className="text-gray-300" />}
+                </button>
+              ))}
+            </div>
+            <textarea
+              value={userComment}
+              onChange={(e) => setUserComment(e.target.value)}
+              className="w-full border rounded px-3 py-2 text-sm mb-2"
+              rows={3}
+              placeholder="Share your thoughts..."
+            />
+            <button
+              className="bg-red-500 text-white px-4 py-2 rounded text-sm hover:bg-pink-600"
+              onClick={handleReviewSubmit}
+            >
+              Submit Review
+            </button>
+          </div>
+
+        )}
+        {/* <hr /> */}
+
+        {productData?.reviews.length === 0 ? (
+          <p className="text-sm text-gray-600">No reviews yet. Be the first to review!</p>
+        ) : (
+          <div className="space-y-4 bg-gray-100 p-2">
+            {productData.reviews.map((rev) => (
+              <div key={rev.id} className="border-b pb-2">
+                <div className="flex items-center gap-2 text-yellow-500">
+                  {Array.from({ length: 5 }).map((_, i) =>
+                    i < rev.rating ? <FaStar key={i} /> : <FaRegStar key={i} className="text-gray-300" />
+                  )}
+                  <span className="text-sm text-gray-700 ml-2">{rev.user.email}</span>
+                </div>
+                <p className="text-sm text-gray-700 mt-1">{rev.comment}</p>
+                <p className="text-xs text-gray-500">{new Date(rev.created_at).toLocaleDateString()}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+
+      </div>
     </div>
   )
 }

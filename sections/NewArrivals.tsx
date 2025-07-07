@@ -5,6 +5,8 @@ import ProductCard from '@/components/ProductCard'
 import { ProductList } from '@/types/core'
 import { addToCart, toggleWishlist } from '@/lib/api/product'
 import toast from 'react-hot-toast'
+import { useAuth } from '@/context/AuthContext'
+import { useRouter } from 'next/navigation'
 
 type Props = {
   newArrivals?: ProductList[]
@@ -12,6 +14,8 @@ type Props = {
 
 export default function NewArrivals({ newArrivals = [] }: Props) {
   const [products, setProducts] = useState<ProductList[]>(newArrivals)
+  const { isAuthenticated } = useAuth()
+  const router = useRouter()
 
   // Update local state if newArrivals prop changes (e.g., from server)
   useEffect(() => {
@@ -19,6 +23,11 @@ export default function NewArrivals({ newArrivals = [] }: Props) {
   }, [newArrivals])
 
   const handleWishlistToggle = async (productId: number) => {
+    if (!isAuthenticated) {
+      toast.error('Please login to add to wishlist.')
+      router.push("/login")
+      return
+    }
     try {
       const res = await toggleWishlist(productId)
       toast.success(res.message)
@@ -35,6 +44,11 @@ export default function NewArrivals({ newArrivals = [] }: Props) {
   }
 
   const handleAddToCart = async (productId: number) => {
+    if (!isAuthenticated) {
+      toast.error('Please login to add to cart.')
+      router.push("/login")
+      return
+    }
     try {
       await addToCart(productId)
       toast.success('Added to cart!')

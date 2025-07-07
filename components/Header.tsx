@@ -35,34 +35,33 @@ export default function Header() {
   return (
     <Suspense fallback={<div>Loading 404...</div>}>
       <>
+        {/* Topbar */}
+        <div className="w-full bg-black text-white text-[11px] md:text-xs py-2 px-4 flex flex-col md:flex-row justify-between gap-2 md:gap-0 sticky top-0 z-50">
+          <div className="flex flex-wrap justify-center md:justify-start gap-4">
+            {isAuthenticated ? (
+              <>
+                <div className="hover:underline" onClick={handleLogOutClick}>Logout</div>
+                {/* <a href="#" className="hover:underline">My Orders</a> */}
+              </>
+            ) : <a href="/login" className="hover:underline">Log In/Sign Up</a>}
+
+            <a href="#" className="hover:underline">Beauty Pass</a>
+          </div>
+          <div className="flex flex-wrap justify-center md:justify-end gap-4">
+            <a href="#" className="hover:underline flex items-center gap-1">
+              <FaMapMarkerAlt className="text-[12px]" /> Store & Events
+            </a>
+            <a href="#" className="hover:underline">Book Beauty Services</a>
+            <a href={isAuthenticated ? "/wishlist" : "/login"} className="hover:underline flex items-center gap-1">
+              <FaHeart className="text-[12px]" /> Wish List
+            </a>
+            <a href={isAuthenticated ? "/cart" : "/login"} className="hover:underline flex items-center gap-1">
+              <FaShoppingCart className="text-[12px]" /> Cart
+            </a>
+          </div>
+        </div>
         {/* Header Top (not sticky) */}
         <header className="w-full z-40 bg-white border-b shadow-sm">
-          {/* Topbar */}
-          <div className="w-full bg-black text-white text-[11px] md:text-xs py-2 px-4 flex flex-col md:flex-row justify-between gap-2 md:gap-0">
-            <div className="flex flex-wrap justify-center md:justify-start gap-4">
-              {isAuthenticated ? (
-                <>
-                  <div className="hover:underline" onClick={handleLogOutClick}>Logout</div>
-                  {/* <a href="#" className="hover:underline">My Orders</a> */}
-                </>
-              ) : <a href="/login" className="hover:underline">Log In/Sign Up</a>}
-
-              <a href="#" className="hover:underline">Beauty Pass</a>
-            </div>
-            <div className="flex flex-wrap justify-center md:justify-end gap-4">
-              <a href="#" className="hover:underline flex items-center gap-1">
-                <FaMapMarkerAlt className="text-[12px]" /> Store & Events
-              </a>
-              <a href="#" className="hover:underline">Book Beauty Services</a>
-              <a href={isAuthenticated ? "/wishlist" : "/login"} className="hover:underline flex items-center gap-1">
-                <FaHeart className="text-[12px]" /> Wish List
-              </a>
-              <a href={isAuthenticated ? "/cart" : "/login"} className="hover:underline flex items-center gap-1">
-                <FaShoppingCart className="text-[12px]" /> Cart
-              </a>
-            </div>
-          </div>
-
           {/* Main Header */}
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between py-3 px-4 gap-4 relative">
             {/* Logo */}
@@ -111,7 +110,7 @@ export default function Header() {
         </header>
 
         {/* Sticky Navigation */}
-        <nav className="sticky top-0 z-50 bg-white border-b">
+        <nav className="sticky top-8 z-50 bg-white shadow-md">
           {/* Desktop Menu */}
           <div className="max-w-7xl mx-auto px-4 py-2 hidden md:flex gap-6 text-sm font-medium text-gray-700 justify-center">
             {data.map((item, i) => (

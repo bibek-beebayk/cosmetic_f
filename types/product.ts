@@ -1,3 +1,5 @@
+import { User } from "./auth";
+
 type Category = {
     name: string;
     slug: string;
@@ -40,6 +42,14 @@ type Variant = {
     sku: string;
 }
 
+type Review = {
+    id: number;
+    comment: string;
+    created_at: string;
+    rating: number;
+    user: User;
+}
+
 export type ProductData = {
     id:  number;
     name: string;
@@ -56,4 +66,6 @@ export type ProductData = {
     shades: Shade[] | [];
     variants: Variant[] | [];
     is_in_wishlist: boolean;
+    reviews: Review[] | [];
+    has_user_reviewed: boolean;
 }

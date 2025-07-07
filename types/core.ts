@@ -38,3 +38,7 @@ export type PaginationType = {
   previous: string | null
   size: number
 }
+
+export type BasicResponse = {
+  message: string
+}

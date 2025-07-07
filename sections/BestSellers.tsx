@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import ProductCard from '@/components/ProductCard'
-import { ProductList } from '@/types/core'
+import { useAuth } from '@/context/AuthContext'
 import { addToCart, toggleWishlist } from '@/lib/api/product'
+import { ProductList } from '@/types/core'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 type Props = {
@@ -12,6 +14,8 @@ type Props = {
 
 export default function BestSellers({ bestSellers = [] }: Props) {
   const [products, setProducts] = useState<ProductList[]>(bestSellers)
+  const { isAuthenticated } = useAuth()
+  const router = useRouter()
 
   // Sync with server data when prop changes
   useEffect(() => {
@@ -19,6 +23,11 @@ export default function BestSellers({ bestSellers = [] }: Props) {
   }, [bestSellers])
 
   const handleWishlistToggle = async (productId: number) => {
+    if (!isAuthenticated) {
+      toast.error('Please login to add to wishlist.')
+      router.push("/login")
+      return
+    }
     try {
       const res = await toggleWishlist(productId)
       toast.success(res.message)
@@ -35,6 +44,12 @@ export default function BestSellers({ bestSellers = [] }: Props) {
   }
 
   const handleAddToCart = async (productId: number) => {
+    console.log("IsAuthenticatedCart: ", isAuthenticated)
+    if (!isAuthenticated) {
+      toast.error('Please login to add to cart.')
+      router.push("/login")
+      return
+    }
     try {
       await addToCart(productId)
       toast.success('Added to cart!')

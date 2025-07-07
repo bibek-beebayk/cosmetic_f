@@ -7,21 +7,6 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { FaTrash } from 'react-icons/fa'
 
-const wishlistItems = [
-  {
-    id: 1,
-    name: 'LANEIGE Lip Glowy Balm',
-    price: 28.0,
-    image: '/products/product1.jpg',
-  },
-  {
-    id: 2,
-    name: 'Rare Beauty Soft Pinch Blush',
-    price: 45.0,
-    image: '/products/product1.jpg',
-  },
-]
-
 export default function WishlistPage() {
 
   const [wishList, setWishList] = useState<ProductList[]>()

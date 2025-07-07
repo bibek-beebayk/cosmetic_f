@@ -90,12 +90,12 @@ axiosInstance.interceptors.response.use(
 );
 
 // Custom error handler
-export const handleAxiosError = (error: any) => {
+export const handleAxiosError = (error: AxiosError) => {
     if (axios.isAxiosError(error)) {
         if (error.response) {
             return {
                 status: error.response.status,
-                message: error.response.data.message || 'An error occurred',
+                message: error.message || 'An error occurred',
                 data: error.response.data
             };
         } else if (error.request) {
@@ -114,22 +114,28 @@ export const handleAxiosError = (error: any) => {
     };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function apiCall<T>(
-    method: 'get' | 'post' | 'put' | 'delete' | 'patch',
-    url: string,
-    data?: any,
-    config?: any
+  method: 'get' | 'post' | 'put' | 'delete' | 'patch',
+  url: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data?: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  config?: any
 ): Promise<T> {
-    try {
-        const response = await axiosInstance({
-            method,
-            url,
-            data,
-            ...config
-        });
-        
-        return response.data;
-    } catch (error) {
-        throw handleAxiosError(error);
-    }
+  try {
+    const response = await axiosInstance({
+      method,
+      url,
+      data,
+      ...config,
+    });
+
+    return response.data;
+    
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  catch (error: any) {
+    throw handleAxiosError(error);
+  }
 }

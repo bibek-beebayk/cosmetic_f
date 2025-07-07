@@ -6,20 +6,10 @@ import { apiCall } from '@/lib/axios'
 import { ProductList } from '@/types/core'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { FaChevronLeft, FaTrash } from 'react-icons/fa'
 
-const cartItems = [
-  {
-    id: 1,
-    name: 'LANEIGE Glowy Balm',
-    variant: 'Blueberry Tint',
-    price: 30.0,
-    image: '/products/product1.jpg',
-    quantity: 1,
-  },
-]
 
 type CartItem = {
   id: number
@@ -38,7 +28,7 @@ export default function CartPage() {
   const [gst, setGst] = useState(0)
   const [total, setTotal] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [refetch, setRefetch] = useState(false)
+  // const [refetch, setRefetch] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -65,7 +55,7 @@ export default function CartPage() {
       }
     }
     fetchCartItems()
-  }, [refetch]) // Empty dependency array to run only on component mount and unmon))
+  }, []) // Empty dependency array to run only on component mount and unmon))
 
 
   if (!items) {
@@ -84,91 +74,92 @@ export default function CartPage() {
       router.refresh()
     }
     catch (error) {
-      console.error("Error during checkout.")
+      console.error(error)
       toast.error("Error during checkout.")
     }
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10">
-      <h1 className="text-2xl font-semibold mb-6">Shopping Cart</h1>
+    <Suspense fallback={<div>Loading login...</div>}>
+      <div className="max-w-7xl mx-auto px-4 py-10">
+        <h1 className="text-2xl font-semibold mb-6">Shopping Cart</h1>
 
-      {/* Cart Layout */}
-      <div className="grid md:grid-cols-3 gap-6">
-        {/* Cart Items */}
-        <div className="md:col-span-2">
-          {items.length === 0 ? (
-            <div className='flex flex-col gap-2'>
-              <p>Your cart looks empty. Browse our catalogue to add items you like. </p>
-              <Link href={"/products/?category=all"} className='w-28 p-2 rounded text-xs bg-red-500 cursor-pointer text-center text-white hover:bg-pink-500'>Show All Items</Link>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {items?.map((item) => (
-                <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between border p-4 rounded">
-                  <div className="flex items-center gap-4 w-full sm:w-auto">
-                    <img src={item?.product_image} alt={item?.product?.name} className="h-24 object-cover rounded" />
-                    <div>
-                      <h3 className="text-sm font-semibold text-gray-800">{item?.product?.name}</h3>
-                      {item?.selected_variant && <p className="text-xs text-gray-500">{item.selected_variant}</p>}
-                      {item?.selected_shade && <p className="text-xs text-gray-500">{item.selected_shade}</p>}
+        {/* Cart Layout */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Cart Items */}
+          <div className="md:col-span-2">
+            {items.length === 0 ? (
+              <div className='flex flex-col gap-2'>
+                <p>Your cart looks empty. Browse our catalogue to add items you like. </p>
+                <Link href={"/products/?category=all"} className='w-28 p-2 rounded text-xs bg-red-500 cursor-pointer text-center text-white hover:bg-pink-500'>Show All Items</Link>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {items?.map((item) => (
+                  <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between border p-4 rounded">
+                    <div className="flex items-center gap-4 w-full sm:w-auto">
+                      <img src={item?.product_image} alt={item?.product?.name} className="h-24 object-cover rounded" />
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-800">{item?.product?.name}</h3>
+                        {item?.selected_variant && <p className="text-xs text-gray-500">{item.selected_variant}</p>}
+                        {item?.selected_shade && <p className="text-xs text-gray-500">{item.selected_shade}</p>}
 
-                      <p className="text-sm mt-1 font-medium">${item?.price}</p>
+                        <p className="text-sm mt-1 font-medium">${item?.price}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3 mt-4 sm:mt-0">
-                    <select
-                      className="border rounded px-2 py-1 text-sm"
-                      value={item.quantity}
-                      onChange={async (e) => {
-                        const newQty = parseInt(e.target.value)
-                        if (newQty !== item.quantity) {
-                          try {
-                            await updateCartQuantity(item.id, newQty)
-                            // Update local state
-                            setItems(prev =>
-                              prev?.map(ci =>
-                                ci.id === item.id ? { ...ci, quantity: newQty } : ci
+                    <div className="flex items-center gap-3 mt-4 sm:mt-0">
+                      <select
+                        className="border rounded px-2 py-1 text-sm"
+                        value={item.quantity}
+                        onChange={async (e) => {
+                          const newQty = parseInt(e.target.value)
+                          if (newQty !== item.quantity) {
+                            try {
+                              await updateCartQuantity(item.id, newQty)
+                              // Update local state
+                              setItems(prev =>
+                                prev?.map(ci =>
+                                  ci.id === item.id ? { ...ci, quantity: newQty } : ci
+                                )
                               )
-                            )
-                            toast.success('Quantity updated!')
-                          } catch (err) {
-                            console.error('Failed to update quantity:', err)
-                          }
-                        }
-                      }}
-                    >
-                      {[1, 2, 3, 4, 5].map((q) => (
-                        <option key={q} value={q}>{q}</option>
-                      ))}
-                    </select>
-
-                    <button className="text-gray-400 hover:text-red-500">
-                      <FaTrash
-                        onClick={async () => {
-                          try {
-                            await removeFromCart(item.id)
-                            // Update local state
-                            setItems(prev => prev?.filter(ci => ci.id !== item.id))
-                            toast.success('Item removed from cart!')
-                          } catch (err) {
-                            console.error('Failed to remove item:', err)
+                              toast.success('Quantity updated!')
+                            } catch (err) {
+                              console.error('Failed to update quantity:', err)
+                            }
                           }
                         }}
-                      />
-                    </button>
+                      >
+                        {[1, 2, 3, 4, 5].map((q) => (
+                          <option key={q} value={q}>{q}</option>
+                        ))}
+                      </select>
+
+                      <button className="text-gray-400 hover:text-red-500">
+                        <FaTrash
+                          onClick={async () => {
+                            try {
+                              await removeFromCart(item.id)
+                              // Update local state
+                              setItems(prev => prev?.filter(ci => ci.id !== item.id))
+                              toast.success('Item removed from cart!')
+                            } catch (err) {
+                              console.error('Failed to remove item:', err)
+                            }
+                          }}
+                        />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-        {/* Summary */}
-        <div className="border p-6 rounded shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+          {/* Summary */}
+          <div className="border p-6 rounded shadow-sm">
+            <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
 
-          {/* <div className="mb-4">
+            {/* <div className="mb-4">
             <label className="text-sm block mb-1">Promo Code</label>
             <div className="flex">
               <input type="text" placeholder="Enter code" className="flex-1 border px-3 py-2 rounded-l text-sm" />
@@ -176,80 +167,81 @@ export default function CartPage() {
             </div>
           </div> */}
 
-          <div className="text-sm space-y-2">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span>${subtotal}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>GST</span>
-              <span>${gst.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between font-semibold text-base pt-2 border-t">
-              <span>Total</span>
-              <span>${total.toFixed(2)}</span>
-            </div>
-          </div>
-
-          <button className="mt-6 w-full bg-red-500 text-white py-2 rounded hover:bg-pink-600 text-sm font-semibold" onClick={() => setIsModalOpen(true)}>
-            Secure Checkout
-          </button>
-
-          <Link href={"/"} className="mt-2 w-full text-sm text-gray-600 hover:text-black flex items-center justify-center gap-1">
-            <FaChevronLeft /> Continue Shopping
-          </Link>
-        </div>
-      </div>
-
-      {isModalOpen && (
-        <div className="transition-opacity duration-300 ease-in-out">
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-10 flex justify-center items-center px-4 ">
-            <div className="bg-white w-full max-w-md rounded shadow-lg p-6 relative">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-lg"
-              >
-                ×
-              </button>
-              <h2 className="text-lg font-semibold mb-4">Confirm Your Order</h2>
-
-              <div className="text-sm space-y-2">
-                {items?.map((item) => (
-                  <div key={item.id} className="flex justify-between border-b py-1">
-                    <img src={item.product_image} alt={item.product.name} className='h-8 w-8 object-cover' />
-                    <div>
-                      <p className="font-medium">{item.product.name}</p>
-                      <p className="font-medium text-xs">{item.selected_variant && `Variant: ${item.selected_variant}`} {item.selected_shade && `Shade: ${item.selected_shade}`}</p>
-                      <p className="text-gray-500 text-xs">Qty: {item.quantity}</p>
-                    </div>
-                    <p>${(item.product.price * item.quantity).toFixed(2)}</p>
-                  </div>
-                ))}
-                <hr />
-                <div className="flex justify-between border-b py-1">
-                  <div>
-                    <p className="font-medium">{"GST"}</p>
-                    {/* <p className="text-gray-500 text-xs">Qty: {}</p> */}
-                  </div>
-                  <p>${(gst)}</p>
-                </div>
-                <hr />
-                <div className="flex justify-between font-semibold pt-2">
-                  <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
-                </div>
+            <div className="text-sm space-y-2">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>${subtotal}</span>
               </div>
-
-              <button
-                onClick={handleCheckout}
-                className="mt-6 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 text-sm font-semibold"
-              >
-                Place Order
-              </button>
+              <div className="flex justify-between">
+                <span>GST</span>
+                <span>${gst.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between font-semibold text-base pt-2 border-t">
+                <span>Total</span>
+                <span>${total.toFixed(2)}</span>
+              </div>
             </div>
+
+            <button className="mt-6 w-full bg-red-500 text-white py-2 rounded hover:bg-pink-600 text-sm font-semibold" onClick={() => setIsModalOpen(true)}>
+              Secure Checkout
+            </button>
+
+            <Link href={"/"} className="mt-2 w-full text-sm text-gray-600 hover:text-black flex items-center justify-center gap-1">
+              <FaChevronLeft /> Continue Shopping
+            </Link>
           </div>
         </div>
-      )}
-    </div>
+
+        {isModalOpen && (
+          <div className="transition-opacity duration-300 ease-in-out">
+            <div className="fixed inset-0 z-50 bg-black bg-opacity-10 flex justify-center items-center px-4 ">
+              <div className="bg-white w-full max-w-md rounded shadow-lg p-6 relative">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-lg"
+                >
+                  ×
+                </button>
+                <h2 className="text-lg font-semibold mb-4">Confirm Your Order</h2>
+
+                <div className="text-sm space-y-2">
+                  {items?.map((item) => (
+                    <div key={item.id} className="flex justify-between border-b py-1">
+                      <img src={item.product_image} alt={item.product.name} className='h-8 w-8 object-cover' />
+                      <div>
+                        <p className="font-medium">{item.product.name}</p>
+                        <p className="font-medium text-xs">{item.selected_variant && `Variant: ${item.selected_variant}`} {item.selected_shade && `Shade: ${item.selected_shade}`}</p>
+                        <p className="text-gray-500 text-xs">Qty: {item.quantity}</p>
+                      </div>
+                      <p>${(item.product.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                  ))}
+                  <hr />
+                  <div className="flex justify-between border-b py-1">
+                    <div>
+                      <p className="font-medium">{"GST"}</p>
+                      {/* <p className="text-gray-500 text-xs">Qty: {}</p> */}
+                    </div>
+                    <p>${(gst)}</p>
+                  </div>
+                  <hr />
+                  <div className="flex justify-between font-semibold pt-2">
+                    <span>Total</span>
+                    <span>${total.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleCheckout}
+                  className="mt-6 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 text-sm font-semibold"
+                >
+                  Place Order
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </ Suspense>
   )
 }

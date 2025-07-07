@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import LoadingSpinner from '@/components/LoadingSpinner'
 import Pagination from '@/components/Pagination'
 import ProductCard from '@/components/ProductCard'
@@ -30,7 +32,7 @@ export default function ProductListPage() {
   // const [priceRange, setPriceRange] = useState(100)
   // const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState('Default')
-  const [visibleCount, setVisibleCount] = useState(6)
+  // const [visibleCount, setVisibleCount] = useState(6)
   const [showFilters, setShowFilters] = useState(false)
   const [products, setProducts] = useState<ProductList[]>()
   const [pagination, setPagination] = useState<PaginationType>()
@@ -124,7 +126,7 @@ export default function ProductListPage() {
                 setMaxPrice={setMaxPrice}
                 sortBy={sortBy}
                 setSortBy={setSortBy}
-                setVisibleCount={setVisibleCount}
+                // setVisibleCount={setVisibleCount}
                 brands={brands}
                 selectedBrand={selectedBrand}
                 setSelectedBrand={setSelectedBrand}
@@ -147,7 +149,7 @@ export default function ProductListPage() {
             // setSearchTerm={setSearchTerm}
             sortBy={sortBy}
             setSortBy={setSortBy}
-            setVisibleCount={setVisibleCount}
+            // setVisibleCount={setVisibleCount}
             brands={brands}
             selectedBrand={selectedBrand}
             setSelectedBrand={setSelectedBrand}
@@ -225,7 +227,7 @@ function Filters({
   minPrice, setMinPrice,
   maxPrice, setMaxPrice,
   sortBy, setSortBy,
-  setVisibleCount,
+  // setVisibleCount,
   brands,
   selectedBrand,
   setSelectedBrand,
@@ -236,7 +238,7 @@ function Filters({
   setMaxPrice: (val: number | '') => void,
   sortBy: string,
   setSortBy: (val: string) => void,
-  setVisibleCount: (val: number) => void
+  // setVisibleCount: (val: number) => void
   brands: BrandData[]
   selectedBrand: string | ""
   setSelectedBrand: (val: string) => void
@@ -267,7 +269,7 @@ function Filters({
               onChange={(e) => {
                 const value = e.target.value
                 setMinPrice(value === '' ? '' : Math.max(0, Number(value)))
-                setVisibleCount(6)
+                // setVisibleCount(6)
               }}
               className="w-1/2 border px-2 py-1 rounded text-sm"
             />
@@ -279,7 +281,7 @@ function Filters({
               onChange={(e) => {
                 const value = e.target.value
                 setMaxPrice(value === '' ? '' : Math.max(0, Number(value)))
-                setVisibleCount(6)
+                // setVisibleCount(6)
               }}
               className="w-1/2 border px-2 py-1 rounded text-sm"
             />

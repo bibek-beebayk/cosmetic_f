@@ -1,9 +1,11 @@
 import { Providers } from '@/app/providers'
 import Footer from '@/components/Footer'
-import Header from '@/components/Header'
+// import Header from '@/components/Header'
 import { Poppins } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
+import { Suspense } from 'react'
+import Header from '@/components/Header'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -25,12 +27,15 @@ export default function RootLayout({
     <html lang="en" className={`${poppins.variable}`}>
       <body className="bg-white text-gray-900 font-sans">
         <Providers>
-          <Header />
-          <div>
-            <Toaster />
-          </div>
-          {children}
-          <Footer />
+          <Suspense fallback={<div>Loading 404...</div>}>
+
+            <Header />
+            <div>
+              <Toaster />
+            </div>
+            {children}
+            <Footer />
+          </Suspense>
         </Providers>
       </body>
     </html>

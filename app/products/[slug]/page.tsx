@@ -6,6 +6,7 @@ import { addToCart, toggleWishlist } from '@/lib/api/product'
 import { apiCall } from '@/lib/axios'
 import { BasicResponse } from '@/types/core'
 import { ProductData } from '@/types/product'
+import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -115,9 +116,9 @@ export default function ProductDetailsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-8 justify-end">
         {/* Product Images */}
-        <div>
+        <div className='flex flex-col justify-start items-center'>
           <img
             src={mainImage}
             alt={productData.name}
@@ -125,10 +126,10 @@ export default function ProductDetailsPage() {
               setIsModalOpen(true)
               setModalIndex(images.indexOf(mainImage!))
             }}
-            className="w-full h-auto object-cover rounded transition-transform duration-300 hover:scale-110 cursor-zoom-in"
+            className=" h-96 object-cover rounded transition-transform duration-300 hover:scale-110 cursor-zoom-in"
           />
 
-          <div className="flex gap-2 mt-4 overflow-auto">
+          <div className="flex gap-2 mt-4 overflow-auto justify-center">
             {images.map((img, idx) => (
               <img
                 key={idx}
@@ -161,7 +162,8 @@ export default function ProductDetailsPage() {
                 return <FaRegStar key={index} className="text-yellow-300" />
               }
             })}
-            <span className="ml-2 text-gray-700 font-medium">{productData.rating?.toFixed(1)}</span>
+            <span className="ml-2 text-gray-700 font-medium">{productData.rating}</span>
+            <span>{`( ${productData.reviews.length} Reviews )`}</span>
           </div>
 
           {/* Price */}
@@ -296,7 +298,7 @@ export default function ProductDetailsPage() {
             </button>
           </div>
 
-          <div className="mt-4 flex gap-2 overflow-x-auto px-4">
+          <div className="mt-4 flex gap-2 px-4">
             {images.map((img, i) => (
               <img
                 key={i}
@@ -306,7 +308,7 @@ export default function ProductDetailsPage() {
                   setModalIndex(i)
                   setMainImage(img)
                 }}
-                className={`w-16 h-16 object-cover rounded cursor-pointer border transition duration-200 ${i === modalIndex ? 'border-white scale-105' : 'border-gray-500'}`}
+                className={`h-16 object-cover rounded cursor-pointer border transition duration-200 ${i === modalIndex ? 'border-white scale-105' : 'border-gray-500'}`}
               />
             ))}
           </div>
@@ -316,7 +318,7 @@ export default function ProductDetailsPage() {
       <div className="mt-10">
         <h3 className="text-lg font-semibold mb-2 uppercase">Customer Reviews</h3>
 
-        {isAuthenticated && (
+        {isAuthenticated ?
           <div className="mt-6 border-t pt-4 mb-6">
             <h4 className="text-md font-medium">Write a Review</h4>
             {productData.has_user_reviewed && <i className='text-xs mb-4 text-yellow-600'>Your existing review will be updated.</i>}
@@ -340,17 +342,17 @@ export default function ProductDetailsPage() {
             >
               Submit Review
             </button>
-          </div>
+          </div> : <Link href={"/login"} className='text-xs'><i>Log in to add a review.</i> </Link>
 
-        )}
+        }
         {/* <hr /> */}
 
         {productData?.reviews.length === 0 ? (
-          <p className="text-sm text-gray-600">No reviews yet. Be the first to review!</p>
+          <p className="text-sm text-gray-600">No reviews yet.</p>
         ) : (
           <div className="space-y-4 bg-gray-100 p-2">
             {productData.reviews.map((rev) => (
-              <div key={rev.id} className="border-b pb-2">
+              <div key={rev.id} className="pb-2">
                 <div className="flex items-center gap-2 text-yellow-500">
                   {Array.from({ length: 5 }).map((_, i) =>
                     i < rev.rating ? <FaStar key={i} /> : <FaRegStar key={i} className="text-gray-300" />
@@ -363,8 +365,6 @@ export default function ProductDetailsPage() {
             ))}
           </div>
         )}
-
-
       </div>
     </div>
   )

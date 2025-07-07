@@ -1,10 +1,12 @@
 'use client'
 
 import LoadingSpinner from '@/components/LoadingSpinner'
+import { useAuth } from '@/context/AuthContext'
 import { addToCart, toggleWishlist } from '@/lib/api/product'
 import { apiCall } from '@/lib/axios'
 import { ProductData } from '@/types/product'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
+import { Router } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { FaHeart, FaRegStar, FaStar, FaStarHalfAlt } from 'react-icons/fa'
@@ -20,6 +22,8 @@ export default function ProductDetailsPage() {
   const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null)
   const [selectedShadeId, setSelectedShadeId] = useState<number | null>(null)
   const [availableQuantity, setAvailableQuantity] = useState<number>(0)
+  const router = useRouter()
+  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -73,14 +77,16 @@ export default function ProductDetailsPage() {
   }
 
   const handleAddToCart = async () => {
+    console.log("Is Authenticated Cat: ", isAuthenticated)
+    if (!isAuthenticated) router.push("/login");
 
-    try{
+    try {
       console.log("Add To Cart Button clicked")
       const response = await addToCart(productData.id, quantity, selectedShade?.id, selectedVariant?.id)
-      console.log("Response: ",response)
+      console.log("Response: ", response)
       toast.success("Added to cart")
 
-    } catch(error){
+    } catch (error) {
       console.error(error)
     }
   }

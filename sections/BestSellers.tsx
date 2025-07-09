@@ -44,7 +44,6 @@ export default function BestSellers({ bestSellers = [] }: Props) {
   }
 
   const handleAddToCart = async (productId: number) => {
-    console.log("IsAuthenticatedCart: ", isAuthenticated)
     if (!isAuthenticated) {
       toast.error('Please login to add to cart.')
       router.push("/login")

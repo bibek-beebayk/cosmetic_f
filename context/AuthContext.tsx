@@ -8,8 +8,7 @@ import type { User, AuthTokens, LoginCredentials } from '@/types/auth';
 interface AuthContextType {
     user: User | null;
     tokens: AuthTokens | null;
-    // siteSettings: SiteSettings | null;
-    isAuthenticated: boolean;
+    isAuthenticated: boolean | null;
     isLoading: boolean;
     login: (credentials: LoginCredentials) => Promise<void>;
     logout: () => Promise<void>;
@@ -22,7 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const [user, setUser] = useState<User | null>(null);
     const [tokens, setTokens] = useState<AuthTokens | null>(null);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     // const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
 
@@ -59,6 +58,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         throw refreshError;
                     }
                 }
+            } else{
+                setIsAuthenticated(false);
             }
         } catch (error) {
             console.error('Auth initialization error:', error);

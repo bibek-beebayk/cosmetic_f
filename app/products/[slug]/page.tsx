@@ -82,7 +82,6 @@ export default function ProductDetailsPage() {
   }
 
   const handleAddToCart = async () => {
-    console.log("Is Authenticated Cat: ", isAuthenticated)
     if (!isAuthenticated) router.push("/login");
 
     try {

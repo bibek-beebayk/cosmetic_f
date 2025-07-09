@@ -24,7 +24,7 @@ type Property = {
     value: string;
 }
 
-type Shade = {
+export type Shade = {
     id: number;
     name: string;
     hex_code: string;
@@ -33,7 +33,7 @@ type Shade = {
     stock: number;
 }
 
-type Variant = {
+export type Variant = {
     id: number;
     name: string;
     price: number;

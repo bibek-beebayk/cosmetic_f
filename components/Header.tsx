@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
 import { CiSearch } from 'react-icons/ci'
 import { FaBars, FaHeart, FaShoppingCart, FaTimes } from 'react-icons/fa'
+import LoadingSpinner from './LoadingSpinner'
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -16,8 +17,6 @@ export default function Header() {
   const [searchTerm, setSearchTerm] = useState('')
   const router = useRouter()
   const { isAuthenticated, logout } = useAuth()
-
-  console.log("Is Authenticated: ", isAuthenticated)
 
   const category = searchParams.get('category')
 
@@ -33,7 +32,7 @@ export default function Header() {
   }
 
   return (
-    <Suspense fallback={<div>Loading 404...</div>}>
+    <Suspense fallback={<LoadingSpinner />}>
       <>
         {/* Topbar */}
         <div className="w-full bg-black text-white text-[11px] md:text-xs py-2 px-4 flex flex-col md:flex-row justify-between gap-2 md:gap-0 sticky top-0 z-50">
@@ -41,9 +40,9 @@ export default function Header() {
             {isAuthenticated ? (
               <>
                 <div className="hover:underline" onClick={handleLogOutClick}>Logout</div>
-                {/* <a href="#" className="hover:underline">My Orders</a> */}
+                <Link href="/account" className="hover:underline">Account</Link>
               </>
-            ) : <a href="/login" className="hover:underline">Log In/Sign Up</a>}
+            ) : <Link href="/login" className="hover:underline">Log In/Sign Up</Link>}
 
             {/* <a href="#" className="hover:underline">Beauty Pass</a> */}
           </div>
@@ -51,13 +50,13 @@ export default function Header() {
             {/* <a href="#" className="hover:underline flex items-center gap-1">
               <FaMapMarkerAlt className="text-[12px]" /> Store & Events
             </a> */}
-            <a href="#" className="hover:underline">Book Beauty Services</a>
-            <a href={isAuthenticated ? "/wishlist" : "/login"} className="hover:underline flex items-center gap-1">
+            <Link href="#" className="hover:underline">Book Beauty Services</Link>
+            <Link href={isAuthenticated ? "/wishlist" : "/login"} className="hover:underline flex items-center gap-1">
               <FaHeart className="text-[12px]" /> Wish List
-            </a>
-            <a href={isAuthenticated ? "/cart" : "/login"} className="hover:underline flex items-center gap-1">
+            </Link>
+            <Link href={isAuthenticated ? "/cart" : "/login"} className="hover:underline flex items-center gap-1">
               <FaShoppingCart className="text-[12px]" /> Cart
-            </a>
+            </Link>
           </div>
         </div>
         {/* Header Top (not sticky) */}
@@ -116,9 +115,9 @@ export default function Header() {
             {data.map((item, i) => (
 
               <div key={i} className="relative group">
-                <a href={item.link} className={`hover:text-primary transition whitespace-nowrap ${item.link.split("=")[1] == category ? "text-red-600" : "text-black"}`}>
+                <Link href={item.link} className={`hover:text-primary transition whitespace-nowrap ${item.link.split("=")[1] == category ? "text-red-600" : "text-black"}`}>
                   {item.title}
-                </a>
+                </Link>
                 {item.submenu && item.submenu.length > 0 && (
                   <div className="absolute top-full left-0 hidden group-hover:block bg-white shadow-md border mt-2 py-2 px-4">
                     {item.submenu.map((sub, j) => (
@@ -139,24 +138,24 @@ export default function Header() {
             <div className="flex flex-col px-4 pb-4 text-sm font-medium text-gray-700 border-t">
               {data.map((item, i) => (
                 <div key={i}>
-                  <a
+                  <Link
                     href={item.link}
                     className="py-2 block border-b last:border-b-0 hover:text-primary transition"
                     onClick={() => setMenuOpen(false)}
                   >
                     {item.title}
-                  </a>
+                  </Link>
                   {item.submenu && (
                     <div className="pl-4 text-gray-600">
                       {item.submenu.map((sub, j) => (
-                        <a
+                        <Link
                           key={j}
                           href={sub.link}
                           className="block py-1 border-b text-sm hover:text-primary"
                           onClick={() => setMenuOpen(false)}
                         >
                           {sub.link}
-                        </a>
+                        </Link>
                       ))}
                     </div>
                   )}

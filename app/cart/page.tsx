@@ -4,7 +4,6 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import { removeFromCart, updateCartQuantity } from '@/lib/api/product'
 import { apiCall } from '@/lib/axios'
 import { ProductList } from '@/types/core'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Suspense, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -95,7 +94,7 @@ export default function CartPage() {
                 {items?.map((item) => (
                   <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between border p-4 rounded">
                     <div className="flex items-center gap-4 w-full sm:w-auto">
-                      <Image src={item?.product_image} alt={item?.product?.name} className="h-24 object-cover rounded" />
+                      <img src={item?.product_image} alt={item?.product?.name} className="h-24 object-cover rounded" />
                       <div>
                         <h3 className="text-sm font-semibold text-gray-800">{item?.product?.name}</h3>
                         {item?.selected_variant && <p className="text-xs text-gray-500">{item.selected_variant}</p>}
@@ -198,7 +197,7 @@ export default function CartPage() {
                 <div className="text-sm space-y-2">
                   {items?.map((item) => (
                     <div key={item.id} className="flex justify-between border-b py-1">
-                      <Image src={item.product_image} alt={item.product.name} className='h-8 w-8 object-cover' />
+                      <img src={item.product_image} alt={item.product.name} className='h-8 w-8 object-cover' />
                       <div>
                         <p className="font-medium">{item.product.name}</p>
                         <p className="font-medium text-xs">{item.selected_variant && `Variant: ${item.selected_variant}`} {item.selected_shade && `Shade: ${item.selected_shade}`}</p>

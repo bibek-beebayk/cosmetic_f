@@ -171,7 +171,6 @@ export default function ProductListPage() {
                     console.log("Res: ", res)
                     toast.success(res.message)
                     setWishListToggled((prev) => !prev)
-                    // Optionally update local product state here
                   } catch (err) {
                     console.error('Wishlist toggle failed', err)
                     toast.error("An error occured.")
@@ -180,7 +179,7 @@ export default function ProductListPage() {
                 onAddToCart={async () => {
                   try {
                     await addToCart(p.id)
-                    // Optionally show toast/snackbar
+                    toast.success("Added to Cart")
                   } catch (err) {
                     console.error('Add to cart failed', err)
                   }
@@ -191,27 +190,6 @@ export default function ProductListPage() {
         </div>
       </div>
 
-      {/* Load More Button */}
-      {/* {pagination && pagination.next && (
-        <div className="flex justify-center mt-10">
-          <button
-            onClick={() => setVisibleCount((prev) => prev + 6)}
-            className="px-6 py-2 text-sm rounded bg-red-500 text-white hover:bg-pink-600"
-          >
-            Load More
-          </button>
-        </div>
-      )} */}
-
-      {/* Load More Button for Mobile */}
-      {/* <div className="flex justify-center mt-10">
-        <button
-          onClick={() => setVisibleCount((prev) => prev + 6)}
-          className="px-6 py-2 text-sm rounded bg-red-500 text-white hover:bg-pink-600"
-        >
-          Load More
-        </button>
-      </div> */}
       {pagination && pagination.pages > 1 && (
         <Pagination
           currentPage={pagination.page}

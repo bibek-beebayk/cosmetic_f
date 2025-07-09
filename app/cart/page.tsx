@@ -68,6 +68,7 @@ export default function CartPage() {
       await apiCall("post", "/checkout/")
       setIsModalOpen(false)
       setRefetch(!refetch)
+      toast.success("Order placed.")
     }
     catch (error) {
       console.error(error)

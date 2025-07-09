@@ -103,6 +103,7 @@ export default function AccountPage() {
             setShowEditModal(false);
             fetchUserData();
         } catch (e) {
+            console.error(e)
             toast.error("Failed to update profile.");
         }
     };
@@ -133,8 +134,10 @@ export default function AccountPage() {
             setShowPasswordModal(false);
             setExistingPassword('');
             setNewPassword('');
-            setConfirmPassword('');
-        } catch (e: any) {
+            setConfirmPassword('');   
+        } 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        catch (e: any) {
             console.log(e)
             toast.error(e.data.detail);
         }

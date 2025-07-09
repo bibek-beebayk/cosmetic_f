@@ -4,8 +4,8 @@ import LoadingSpinner from '@/components/LoadingSpinner'
 import { removeFromCart, updateCartQuantity } from '@/lib/api/product'
 import { apiCall } from '@/lib/axios'
 import { ProductList } from '@/types/core'
+import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { FaChevronLeft, FaTrash } from 'react-icons/fa'
@@ -21,41 +21,43 @@ type CartItem = {
   product_image: string
 }
 
+type NumberData = {
+  subtotal: number,
+  total: number,
+  gst_rate: number,
+  gst_amount: number,
+  total_items: number
+}
+
 export default function CartPage() {
 
-  const [items, setItems] = useState<CartItem[]>()
-  const [subtotal, setSubtotal] = useState(0)
-  const [gst, setGst] = useState(0)
-  const [total, setTotal] = useState(0)
+  const [items, setItems] = useState<CartItem[] | []>()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  // const [refetch, setRefetch] = useState(false)
-  const router = useRouter()
-
-  useEffect(() => {
-    if (items && items.length > 0) {
-      const sub = items.reduce((acc, item) => acc + item.price * item.quantity, 0)
-      const g = sub * 0.1
-      const t = sub + g
-      setSubtotal(sub)
-      setGst(g)
-      setTotal(t)
-    }
-  }, [items])
+  const [refetch, setRefetch] = useState(false)
+  const [numbers, setNumbers] = useState<NumberData>({
+    subtotal: 0,
+    total: 0,
+    gst_rate: 0.1,
+    gst_amount: 0,
+    total_items: 0
+  })
 
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
         const response = await apiCall<CartItem[]>('get', '/cart/')
-        // const data = await response.json()
         setItems(response)
-        console.log(response)
+
+        const numbers = await apiCall<NumberData>('get', '/cart/get-numbers/')
+        console.log("Numbers: ", numbers)
+        setNumbers(numbers)
       }
       catch (error) {
         console.error('Error fetching cart items:', error)
       }
     }
     fetchCartItems()
-  }, []) // Empty dependency array to run only on component mount and unmon))
+  }, [refetch])
 
 
   if (!items) {
@@ -64,14 +66,9 @@ export default function CartPage() {
 
   const handleCheckout = async () => {
     try {
-      const res = await apiCall("post", "/checkout/")
-      console.log("Response Data: ", res)
-      toast.success("Order placed.")
+      await apiCall("post", "/checkout/")
       setIsModalOpen(false)
-      // setRefetch(!refetch)
-      // setItems([])
-      // router.push("/cart")
-      router.refresh()
+      setRefetch(!refetch)
     }
     catch (error) {
       console.error(error)
@@ -98,7 +95,7 @@ export default function CartPage() {
                 {items?.map((item) => (
                   <div key={item.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between border p-4 rounded">
                     <div className="flex items-center gap-4 w-full sm:w-auto">
-                      <img src={item?.product_image} alt={item?.product?.name} className="h-24 object-cover rounded" />
+                      <Image src={item?.product_image} alt={item?.product?.name} className="h-24 object-cover rounded" />
                       <div>
                         <h3 className="text-sm font-semibold text-gray-800">{item?.product?.name}</h3>
                         {item?.selected_variant && <p className="text-xs text-gray-500">{item.selected_variant}</p>}
@@ -116,12 +113,7 @@ export default function CartPage() {
                           if (newQty !== item.quantity) {
                             try {
                               await updateCartQuantity(item.id, newQty)
-                              // Update local state
-                              setItems(prev =>
-                                prev?.map(ci =>
-                                  ci.id === item.id ? { ...ci, quantity: newQty } : ci
-                                )
-                              )
+                              setRefetch(!refetch)
                               toast.success('Quantity updated!')
                             } catch (err) {
                               console.error('Failed to update quantity:', err)
@@ -139,9 +131,8 @@ export default function CartPage() {
                           onClick={async () => {
                             try {
                               await removeFromCart(item.id)
-                              // Update local state
-                              setItems(prev => prev?.filter(ci => ci.id !== item.id))
                               toast.success('Item removed from cart!')
+                              setRefetch(!refetch)
                             } catch (err) {
                               console.error('Failed to remove item:', err)
                             }
@@ -170,15 +161,15 @@ export default function CartPage() {
             <div className="text-sm space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${subtotal}</span>
+                <span>${numbers.subtotal}</span>
               </div>
               <div className="flex justify-between">
-                <span>GST</span>
-                <span>${gst.toFixed(2)}</span>
+                <span>GST {`(${(numbers.gst_rate * 100)}%)`}</span>
+                <span>${numbers.gst_amount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between font-semibold text-base pt-2 border-t">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>${numbers.total}</span>
               </div>
             </div>
 
@@ -207,7 +198,7 @@ export default function CartPage() {
                 <div className="text-sm space-y-2">
                   {items?.map((item) => (
                     <div key={item.id} className="flex justify-between border-b py-1">
-                      <img src={item.product_image} alt={item.product.name} className='h-8 w-8 object-cover' />
+                      <Image src={item.product_image} alt={item.product.name} className='h-8 w-8 object-cover' />
                       <div>
                         <p className="font-medium">{item.product.name}</p>
                         <p className="font-medium text-xs">{item.selected_variant && `Variant: ${item.selected_variant}`} {item.selected_shade && `Shade: ${item.selected_shade}`}</p>
@@ -219,15 +210,15 @@ export default function CartPage() {
                   <hr />
                   <div className="flex justify-between border-b py-1">
                     <div>
-                      <p className="font-medium">{"GST"}</p>
+                      <p className="font-medium">{`GST (${numbers.gst_rate * 100}%)`}</p>
                       {/* <p className="text-gray-500 text-xs">Qty: {}</p> */}
                     </div>
-                    <p>${(gst)}</p>
+                    <p>${(numbers.gst_amount.toFixed(2))}</p>
                   </div>
                   <hr />
                   <div className="flex justify-between font-semibold pt-2">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>${numbers.total.toFixed(2)}</span>
                   </div>
                 </div>
 

@@ -1,5 +1,7 @@
 'use client'
 
+import Image from "next/image"
+
 const blog = {
   title: '5 Skincare Tips for Glowing Skin',
   date: '28 Jun 2025',
@@ -38,7 +40,7 @@ const suggestedPosts = [
 export default function BlogDetailsPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
-      <img src={blog.image} alt={blog.title} className="w-full h-64 object-cover rounded mb-6" />
+      <Image src={blog.image} alt={blog.title} className="w-full h-64 object-cover rounded mb-6" />
       <p className="text-xs text-gray-400 mb-2">{blog.date}</p>
       <h1 className="text-3xl font-bold text-gray-800 mb-4">{blog.title}</h1>
       <div className="prose prose-sm sm:prose lg:prose-lg max-w-none text-gray-700 mb-12">
@@ -56,7 +58,7 @@ export default function BlogDetailsPage() {
             key={post.id}
             className="min-w-[200px] max-w-[200px] border rounded-md overflow-hidden shadow hover:shadow-md transition"
           >
-            <img src={post.image} alt={post.title} className="w-full h-32 object-cover" />
+            <Image src={post.image} alt={post.title} className="w-full h-32 object-cover" />
             <div className="p-3">
               <h3 className="text-sm font-medium text-gray-800 mb-1">{post.title}</h3>
               <a href="#" className="text-primary text-xs font-medium hover:underline">

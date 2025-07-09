@@ -1,5 +1,6 @@
 'use client'
 
+import Image from "next/image"
 import Link from "next/link"
 
 const blogPosts = [
@@ -39,7 +40,7 @@ export default function BlogListPage() {
             key={post.id}
             className="border rounded-md overflow-hidden shadow hover:shadow-lg transition"
           >
-            <img
+            <Image
               src={post.image}
               alt={post.title}
               className="w-full h-48 object-cover"

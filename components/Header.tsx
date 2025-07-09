@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
 import { CiSearch } from 'react-icons/ci'
-import { FaBars, FaHeart, FaMapMarkerAlt, FaShoppingCart, FaTimes } from 'react-icons/fa'
+import { FaBars, FaHeart, FaShoppingCart, FaTimes } from 'react-icons/fa'
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -45,12 +45,12 @@ export default function Header() {
               </>
             ) : <a href="/login" className="hover:underline">Log In/Sign Up</a>}
 
-            <a href="#" className="hover:underline">Beauty Pass</a>
+            {/* <a href="#" className="hover:underline">Beauty Pass</a> */}
           </div>
           <div className="flex flex-wrap justify-center md:justify-end gap-4">
-            <a href="#" className="hover:underline flex items-center gap-1">
+            {/* <a href="#" className="hover:underline flex items-center gap-1">
               <FaMapMarkerAlt className="text-[12px]" /> Store & Events
-            </a>
+            </a> */}
             <a href="#" className="hover:underline">Book Beauty Services</a>
             <a href={isAuthenticated ? "/wishlist" : "/login"} className="hover:underline flex items-center gap-1">
               <FaHeart className="text-[12px]" /> Wish List

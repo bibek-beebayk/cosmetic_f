@@ -1,15 +1,16 @@
 'use client'
 
 import { useAuth } from '@/context/AuthContext'
-import { Suspense, useState } from 'react'
-import { FcGoogle } from 'react-icons/fc'
 import { apiCall } from '@/lib/axios'
-import toast from 'react-hot-toast'
+import { useGoogleLogin } from '@react-oauth/google'
 import { useRouter } from 'next/navigation'
+import { Suspense, useState } from 'react'
+import toast from 'react-hot-toast'
+import { FcGoogle } from 'react-icons/fc'
 
 export default function AuthPage() {
   const [mode, setMode] = useState<'login' | 'register'>('login')
-  const { login } = useAuth()
+  const { login, googleLogin } = useAuth()
   const router = useRouter()
 
   const [step, setStep] = useState<'form' | 'verify'>('form')
@@ -19,9 +20,27 @@ export default function AuthPage() {
   const [fullName, setFullName] = useState('')
   const [otp, setOtp] = useState('')
 
-  const handleGoogleLogin = () => {
-    alert('Google login triggered')
-  }
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      console.log("Google Response: ", response);
+      const token = response.access_token;
+
+      try {
+        await googleLogin(token);
+        toast.success('Logged in with Google');
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      catch (error: any) {
+        console.error(error)
+        toast.error('Google login failed');
+      }
+    },
+    onError: () => {
+      toast.error('Google login failed');
+    },
+    flow: 'implicit',
+    scope: 'email profile'
+  });
 
   const handleLogin = async () => {
     const credentials = { email, password }
@@ -30,7 +49,7 @@ export default function AuthPage() {
       // alert('Login successful')
       toast.success("Logged in successfully")
       router.push("/")
-    } 
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error: any) {
       toast.error(error.data.detail)
@@ -57,7 +76,7 @@ export default function AuthPage() {
       toast.success('Account created. Please login.')
       setMode('login')
       setStep('form')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       console.log(e)
       toast.error('Invalid OTP')
@@ -147,7 +166,10 @@ export default function AuthPage() {
 
                 <div className="text-center text-gray-500 text-sm mb-3">or</div>
 
-                <button onClick={handleGoogleLogin} className="w-full flex items-center justify-center gap-2 border py-2 rounded hover:bg-gray-100 transition text-sm">
+                <button
+                  onClick={() => handleGoogleLogin()}
+                  className="w-full flex items-center justify-center gap-2 border py-2 rounded hover:bg-gray-100 transition text-sm"
+                >
                   <FcGoogle className="text-xl" />
                   Continue with Google
                 </button>

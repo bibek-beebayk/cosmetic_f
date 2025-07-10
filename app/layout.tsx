@@ -29,7 +29,6 @@ export default function RootLayout({
       <body className="bg-white text-gray-900 font-sans">
         <Providers>
           <Suspense fallback={<LoadingSpinner />}>
-
             <Header />
             <div>
               <Toaster />

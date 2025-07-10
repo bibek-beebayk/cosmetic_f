@@ -1,9 +1,9 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { apiCall } from '@/lib/axios';
-import type { User, AuthTokens, LoginCredentials } from '@/types/auth';
+import type { AuthTokens, LoginCredentials, User } from '@/types/auth';
+import { useRouter } from 'next/navigation';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface AuthContextType {
     user: User | null;
@@ -11,6 +11,7 @@ interface AuthContextType {
     isAuthenticated: boolean | null;
     isLoading: boolean;
     login: (credentials: LoginCredentials) => Promise<void>;
+    googleLogin: (token: string) => Promise<void>;
     logout: () => Promise<void>;
     refreshToken: () => Promise<void>;
 }
@@ -34,12 +35,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const storedTokens = localStorage.getItem('auth_tokens');
             const storedUserData = localStorage.getItem('user_data');
             const storedSiteSettings = localStorage.getItem('site_settings');
-            
+
             if (storedTokens && storedUserData) {
                 const parsedTokens: AuthTokens = JSON.parse(storedTokens);
                 const parsedUserData: User = JSON.parse(storedUserData);
                 // const parsedSiteSettings: SiteSettings = JSON.parse(storedSiteSettings || '{}');
-                
+
                 setTokens(parsedTokens);
                 // setSiteSettings(parsedSiteSettings);
 
@@ -58,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         throw refreshError;
                     }
                 }
-            } else{
+            } else {
                 setIsAuthenticated(false);
             }
         } catch (error) {
@@ -92,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const login = async (credentials: LoginCredentials) => {
         try {
             const response = await apiCall<any>('post', '/auth/login/', credentials);
-            
+
             const authTokens: AuthTokens = {
                 access: response.access_token,
                 refresh: response.refresh_token
@@ -103,7 +104,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 email: response.email,
             }
 
-            
+
             setTokens(authTokens);
             setUser(userData);
             setIsAuthenticated(true);
@@ -115,6 +116,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         } catch (error) {
             console.error('Login error:', error);
+            throw error;
+        }
+    };
+
+    const googleLogin = async (token: string) => {
+        try {
+            const response = await apiCall<any>('post', '/auth/google-login/', { token });
+
+            const authTokens: AuthTokens = {
+                access: response.access_token,
+                refresh: response.refresh_token
+            };
+
+            const userData: User = {
+                id: response.id,
+                email: response.email,
+            };
+
+            setTokens(authTokens);
+            setUser(userData);
+            setIsAuthenticated(true);
+
+            localStorage.setItem('auth_tokens', JSON.stringify(authTokens));
+            localStorage.setItem('user_data', JSON.stringify(userData));
+
+            router.push('/');
+
+        } catch (error) {
+            console.error('Google login error:', error);
             throw error;
         }
     };
@@ -147,6 +177,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAuthenticated,
         isLoading,
         login,
+        googleLogin,
         logout,
         refreshToken,
     };

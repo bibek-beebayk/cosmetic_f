@@ -1,0 +1,1 @@
+export const GOOGLE_OAUTH_CLIENT_ID = process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID ? process.env.NEXT_PUBLIC_OAUTH_CLIENT_ID : ""
